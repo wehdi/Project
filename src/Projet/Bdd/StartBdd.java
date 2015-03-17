@@ -10,7 +10,7 @@ public class StartBdd {
 	private final String url = "jdbc:mysql://localhost:3306/mydb";
 	private final String login = "root";
 	private final String mdp = "hdime";
-	//private String sql = "SELECT Jour FROM planning";
+	// private String sql = "SELECT Jour FROM planning";
 	private Connection connection = null;
 	private java.sql.Statement stat = null;
 	private java.sql.ResultSet rs = null;
@@ -54,19 +54,40 @@ public class StartBdd {
 		stat.close();
 	}
 
-	public ArrayList read(String sql) throws SQLException {
+	public ArrayList<String> getDay() throws SQLException {
+		String sql = "SELECT Jour FROM planning";
 		this.stat = connection.createStatement();
 		this.rs = this.stat.executeQuery(sql);
 		ArrayList<String> data = new ArrayList<>();
-		// String prof = "mehdi";
 		while (this.rs.next()) {
 			String prof = rs.getString("Jour");
-			//System.out.println("depuis star : " + data);
 			data.add(prof);
-
 		}
 		return data;
-
+	}
+	
+	public ArrayList<String> getHeur() throws SQLException {
+		String sql = "SELECT Heur FROM planning";
+		this.stat = connection.createStatement();
+		this.rs = this.stat.executeQuery(sql);
+		ArrayList<String> data = new ArrayList<>();
+		while (this.rs.next()) {
+			String prof = rs.getString("Heur");
+			data.add(prof);
+		}
+		return data;
+	}
+	
+	public ArrayList<String> getModule() throws SQLException {
+		String sql = "SELECT Module FROM planning";
+		this.stat = connection.createStatement();
+		this.rs = this.stat.executeQuery(sql);
+		ArrayList<String> data = new ArrayList<>();
+		while (this.rs.next()) {
+			String prof = rs.getString("Module");
+			data.add(prof);
+		}
+		return data;
 	}
 
 }
