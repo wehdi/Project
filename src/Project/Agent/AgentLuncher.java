@@ -1,69 +1,58 @@
 package Project.Agent;
 
-import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.lang.acl.ACLMessage;
+import jade.util.ExtendedProperties;
+import jade.util.leap.Properties;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
-@SuppressWarnings("serial")
-public class AgentLuncher extends Agent {
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+public class AgentLuncher {
 	private Runtime runtime;
 	private Profile profile;
-	private Profile profile2;
-	private ContainerController container;
-	private ContainerController container2;
-
+	private ContainerController container;;
 	private AgentController agentFils;
 	private AgentController agentFils1;
+	private Properties proprties;
 
-	protected void setup() {
+	public AgentLuncher() {
+		proprties = new ExtendedProperties();
+		proprties.setProperty(Profile.GUI, "true");
+		profile = new ProfileImpl(proprties);
+		Runtime.instance().setCloseVM(true);
 		runtime = Runtime.instance();
-		profile = new ProfileImpl();
-		// profile2 = new ProfileImpl();
-
-		container = runtime.createAgentContainer(profile);
-		// container2= runtime.createAgentContainer(profile2);
-
+		if (profile.getBooleanProperty(Profile.MAIN, true)) {
+			container = runtime.createMainContainer(profile);
+		} else {
+			container = runtime.createAgentContainer(profile);
+		}
 		try {
 			agentFils = container.createNewAgent("agentInterface",
 					"Project.Agent.AgentInterface", null);
 			agentFils.start();
-			doWait(100);
 
 			agentFils1 = container.createNewAgent("agentBdd",
 					"Project.Agent.AgentBdd", null);
 			agentFils1.start();
-
-
-			addBehaviour(new CyclicBehaviour() {
-
-				public void action() {
-					System.out
-							.println("Agent " + getLocalName() + " est lance");
-					ACLMessage msg = myAgent.receive();
-					if (msg != null) {
-						String content = msg.getContent();
-
-						System.out.println("Received Request from "
-								+ msg.getSender().getLocalName());
-						System.out.println("Received Message : " + content
-								+ myAgent.getLocalName());
-					} else {
-						System.out.println("No message :"
-								+ myAgent.getLocalName());
-						block();
-					}
-
-				}
-			});
-
 		} catch (StaleProxyException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static void main(String[] args) {
+
+		// Look And Feel
+		try {
+			UIManager
+					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+			new AgentLuncher();
+		} catch (ClassNotFoundException | InstantiationException
+				| IllegalAccessException | UnsupportedLookAndFeelException ex) {
 		}
 
 	}

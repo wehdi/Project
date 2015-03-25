@@ -2,102 +2,178 @@ package Project.Agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.ParallelBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.core.messaging.MessageStorage;
 import jade.lang.acl.ACLMessage;
-import jade.util.leap.Serializable;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.concurrent.CyclicBarrier;
 
+import javax.swing.ViewportLayout;
+import javax.xml.ws.Response;
+
+import Project.Metiers.Generate_Planning;
 import Projet.Bdd.StartBdd;
 
 @SuppressWarnings("serial")
-public class AgentBdd extends Agent implements Serializable,
-		java.io.Serializable {
-
-	// private final String serviceName = "BDD";
-	// private Object[] obj = null;
-
-	// private GUIproject guiProject;
+public class AgentBdd extends Agent {
 	private StartBdd startBdd;
 	private ArrayList<String> dayList;
 	private ArrayList<String> heurList;
 	private ArrayList<String> moduleList;
-	private ArrayList<String> messageList;
+	private ArrayList<String> messageTab;
+	private Generate_Planning generate_Planning;
+	private boolean stop = false;
+	private boolean stop_Planning = false;
 
 	protected void setup() {
-		//
 		startBdd = new StartBdd();
 		dayList = new ArrayList<>();
 		heurList = new ArrayList<>();
 		moduleList = new ArrayList<>();
-		messageList = new ArrayList<>();
-
-		//
+		generate_Planning = new Generate_Planning();
+		messageTab = new ArrayList<>();
+		ParallelBehaviour comportementparallele = new ParallelBehaviour(
+				ParallelBehaviour.WHEN_ALL);
+		SequentialBehaviour comportementSequenctielle = new SequentialBehaviour();
+		// addBehaviour(comportementparallele);
+		addBehaviour(comportementSequenctielle);
 		try {
 			startBdd.openConecction();
 			System.out.println("Connexion is now Open !");
 		} catch (Exception e1) {
 			System.err.println("Erreur when connection open" + e1);
 		}
-		addBehaviour(new CyclicBehaviour() {
-			
-			public void action() {
-				try {
-					if (dayList.isEmpty() || heurList.isEmpty()|| moduleList.isEmpty()) {
-					dayList = startBdd.getDay();
-					heurList = startBdd.getHeur();
-					moduleList = startBdd.getModule();
-					
-					messageList.addAll(dayList);
-					messageList.add("day");
-					messageList.addAll(heurList);
-					messageList.add("heur");
-					messageList.addAll(moduleList);
-					messageList.add("module");
-					sendMessage(myAgent,messageList);
-					
-					//couper l'arrayList
-					System.out.println("days :" +messageList.subList(0, messageList.indexOf("day")));
-					System.out.println("heur : "+ messageList.subList(messageList.indexOf("day")+1, messageList.indexOf("heur")));
-					System.out.println("module : "+ messageList.subList(messageList.indexOf("heur"), messageList.size()-1));
-                    System.out.println(messageList.get(messageList.indexOf("day")).equals("day"));
-                    System.out.println(messageList.get(messageList.indexOf("heur")).equals("heur"));
-                    System.out.println(messageList.get(messageList.indexOf("module")).equals("module"));
-					
-					}
-					else {
-						sendMessage(myAgent,messageList);
-					System.out.println("days :" +messageList.subList(0, messageList.lastIndexOf("day")));
-					System.out.println("heur : "+ messageList.subList(messageList.indexOf("day")+1, messageList.lastIndexOf("heur")));
-					System.out.println("module : "+ messageList.subList(messageList.indexOf("heur"), messageList.size()-1));
+		// verrifi l'inscription
+		comportementSequenctielle.addSubBehaviour(new Behaviour() {
 
+			public void action() {
+				MessageTemplate modele = MessageTemplate.and(
+						MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+						MessageTemplate.MatchConversationId("id"));
+
+				ACLMessage receiveMessage = myAgent.receive(modele);
+
+				if (receiveMessage != null) {
+					String requestMessage = receiveMessage.getContent()
+							.toString();
+					String userName = requestMessage.substring(0,
+							requestMessage.indexOf("|"));
+					String pass = requestMessage.substring(requestMessage
+							.indexOf("|") + 1);
+					System.out.println("voici le msg receiveMessage vla "
+							+ userName + "  " + pass);
+
+					if (userName.equals("aa") && pass.equals("aa")) {
+						ACLMessage reponseMessage = new ACLMessage(
+								ACLMessage.INFORM);
+						AID dummyAid = new AID();
+						dummyAid.setName("agentInterface@192.168.2.3:1099/JADE");
+						dummyAid.addAddresses("http://192.168.2.3:7778/acc");
+						reponseMessage.addReceiver(dummyAid);
+						reponseMessage.setContent("ok");
+						send(reponseMessage);
+						stop = true;
+					} else {
+						block();
 					}
-										attendre();
-				} catch (SQLException | IOException  e) {
+
+				} else {
+					block();
+				}
+			}
+
+			@Override
+			public boolean done() {
+
+				return stop;
+			}
+
+		});
+
+		// envoi le planning
+		comportementSequenctielle.addSubBehaviour(new Behaviour() {
+			@Override
+			public void action() {
+
+				try {
+					if (dayList.isEmpty() || heurList.isEmpty()
+							|| moduleList.isEmpty()) {
+						dayList = startBdd.getDay();
+						heurList = startBdd.getHeur();
+						moduleList = startBdd.getModule();
+						messageTab.addAll(generate_Planning.setPlanning(
+								dayList, heurList, moduleList));
+						sendMessage(myAgent, messageTab);
+
+					} else
+						sendMessage(myAgent, messageTab);
+
+				} catch (SQLException | IOException e) {
 					e.printStackTrace();
 				}
-				attendre();
+
 			}
+
+			@Override
+			public boolean done() {
+				
+				return stop_Planning;
+			}
+
 		});
 
 	}
-	
-	private void sendMessage(Agent myAgent, ArrayList<String>mesmsageList) throws IOException{
+
+	private void sendMessage(Agent myAgent, ArrayList<String> msgList)
+			throws IOException {
 		ACLMessage sendDay = new ACLMessage(ACLMessage.INFORM);
-		sendDay.setContentObject(messageList);
+		sendDay.setConversationId("go");
+		sendDay.setContentObject(msgList);
 		AID dummyAid = new AID();
-		dummyAid.setName("agentGestion@192.168.2.10:1099/JADE");
-		dummyAid.addAddresses("http://192.168.2.10:7778/acc");
-		sendDay.addReceiver(dummyAid);	
+		dummyAid.setName("agentGestion@192.168.2.3:1099/JADE");
+		dummyAid.addAddresses("http://192.168.2.3:7778/acc");
+		sendDay.addReceiver(dummyAid);
 		myAgent.send(sendDay);
-		System.out.println("envoi" + sendDay.toString());
+		System.out.println("send message ..");
+
+		addBehaviour(new Behaviour() {
+
+			@Override
+			public void action() {
+				MessageTemplate model = MessageTemplate.and(
+						MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+						MessageTemplate.MatchConversationId("stop_planning"));
+				ACLMessage reponse = receive(model);
+				if (reponse != null) {
+					String test = reponse.getContent().toString();
+					if (test.equals("stop")){
+						System.out.println("mesasge recu");
+						stop_Planning = true;
+						
+						}
+					
+				} else
+					block();
+
+			}
+			public boolean done() {
+				// TODO Auto-generated method stub
+				return stop_Planning;
+			}});
+
 	}
 
-	@Override
 	protected void takeDown() {
 		System.out.println("Agent data base clos");
 		try {
@@ -106,21 +182,5 @@ public class AgentBdd extends Agent implements Serializable,
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/*
-	 * public void updateBdd(String jour, String heur, String nom_Module) {
-	 * addBehaviour(new OneShotBehaviour() { public void action() {
-	 * System.out.println("Mise a jour de la BDD"); } }); }
-	 */
-
-	public boolean done() {
-		System.out.println("Fermeture de la connexion");
-		attendre();
-		return true;
-	}
-
-	protected void attendre() {
-		doWait(3500);
 	}
 }
