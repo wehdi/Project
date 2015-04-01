@@ -43,8 +43,6 @@ public class AgentBdd extends Agent {
 		moduleList = new ArrayList<>();
 		generate_Planning = new Generate_Planning();
 		messageTab = new ArrayList<>();
-		ParallelBehaviour comportementparallele = new ParallelBehaviour(
-				ParallelBehaviour.WHEN_ALL);
 		SequentialBehaviour comportementSequenctielle = new SequentialBehaviour();
 		// addBehaviour(comportementparallele);
 		addBehaviour(comportementSequenctielle);
@@ -58,6 +56,7 @@ public class AgentBdd extends Agent {
 		comportementSequenctielle.addSubBehaviour(new Behaviour() {
 
 			public void action() {
+
 				MessageTemplate modele = MessageTemplate.and(
 						MessageTemplate.MatchPerformative(ACLMessage.INFORM),
 						MessageTemplate.MatchConversationId("id"));
@@ -77,18 +76,22 @@ public class AgentBdd extends Agent {
 					if (userName.equals("aa") && pass.equals("aa")) {
 						ACLMessage reponseMessage = new ACLMessage(
 								ACLMessage.INFORM);
+						reponseMessage.setConversationId("resp");
 						AID dummyAid = new AID();
 						dummyAid.setName("agentInterface@192.168.2.3:1099/JADE");
 						dummyAid.addAddresses("http://192.168.2.3:7778/acc");
 						reponseMessage.addReceiver(dummyAid);
 						reponseMessage.setContent("ok");
 						send(reponseMessage);
+						// doWake();
 						stop = true;
+
 					} else {
 						block();
 					}
 
 				} else {
+					System.out.println("noo");
 					block();
 				}
 			}
@@ -127,7 +130,7 @@ public class AgentBdd extends Agent {
 
 			@Override
 			public boolean done() {
-				
+
 				return stop_Planning;
 			}
 
@@ -157,24 +160,27 @@ public class AgentBdd extends Agent {
 				ACLMessage reponse = receive(model);
 				if (reponse != null) {
 					String test = reponse.getContent().toString();
-					if (test.equals("stop")){
+					if (test.equals("stop")) {
 						System.out.println("mesasge recu");
 						stop_Planning = true;
-						
-						}
-					
+
+					}
+
 				} else
 					block();
 
 			}
+
 			public boolean done() {
 				// TODO Auto-generated method stub
 				return stop_Planning;
-			}});
+			}
+		});
 
 	}
 
 	protected void takeDown() {
+
 		System.out.println("Agent data base clos");
 		try {
 			startBdd.closeConnection();

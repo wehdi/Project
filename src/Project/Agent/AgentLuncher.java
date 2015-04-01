@@ -22,7 +22,7 @@ public class AgentLuncher {
 
 	public AgentLuncher() {
 		proprties = new ExtendedProperties();
-		proprties.setProperty(Profile.GUI, "true");
+		proprties.setProperty(Profile.GUI, "false");
 		profile = new ProfileImpl(proprties);
 		Runtime.instance().setCloseVM(true);
 		runtime = Runtime.instance();
