@@ -5,7 +5,9 @@ import java.io.OutputStream;
 import javax.swing.JTextArea;
 
 public class MyOutputstream extends OutputStream {
-
+	/**
+	 * Redirection du flux de donnes dans un texteArea
+	 */
 	private JTextArea textArea;
 
 	public MyOutputstream(JTextArea textarea) {

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 public class Generate_Planning {
 	private static ArrayList<String> planningTab = new ArrayList<>();
 
+	/**
+	 * Classe qui genere le planning et le stock dans un ArrayList
+	 */
 	public Generate_Planning() {
 
 	}

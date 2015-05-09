@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintStream;
+import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,30 +19,33 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import Project.Agent.AgentInterface;
+import Project.Agent.AgentScolar;
 
 public class GUIproject extends JFrame implements ActionListener {
 	/**
+	 * @author ProBook 450g2
 	 * 
+	 *         Gui du project
 	 */
 	private static final long serialVersionUID = 1L;
-	// devlaraion des variables
+	/**
+	 * Declaration des variables
+	 */
 	private JFrame frame;
 	private JScrollPane scroll;
 	private JTextArea textArea;
 	private PrintStream prints;
-	private JButton buttonChanger;
+	private JButton buttonArriveUniv;
 	private JButton buttoinArriverProf;
-	private JButton buttonArriver;
+	private JButton ButtonDepart;
 	private JButton buttonAbsProf;
 	private JPanel panel;
 	private Container container;
 	private JButton buttonGoClasse;
-	
 
 	// image
 	private JPanel panelDepartement;
-	
+
 	private JLabel imageDepartement3D;
 	protected JPanel panelUniv;
 	private JLabel imageUniv3D;
@@ -50,26 +54,25 @@ public class GUIproject extends JFrame implements ActionListener {
 	// url image
 	private final String urlImage3Departement3D = "pictures\\Depart3DTrans2.png";
 	private final String urlImgaEtudiant = "pictures\\etudiante.png";
-	private final String urlImageUniv3D  ="pictures\\univ.png";
+	private final String urlImageUniv3D = "pictures\\univ.png";
 
-	private DoMove doMove;
-	AgentInterface  agentInterfaceInerface;
-	
+	private MoveInClasse moveInClasse;
+	private MoveInUniv moveInUniv;
+	protected AgentScolar agentInterfaceInerface;
 
-	
+	public GUIproject(final AgentScolar agentScolar) {
+		this.agentInterfaceInerface = agentScolar;
 
-	public GUIproject(final AgentInterface agentInterface) {
-		this.agentInterfaceInerface = agentInterface;
-
-		//super(oneShotBehaviour.getLocalName());
-		// instantiation des objets
+		/**
+		 * Instantiation
+		 */
 		frame = new JFrame("University");
 		container = frame.getContentPane();
 		textArea = new JTextArea();
 		panel = new JPanel();
 		scroll = new JScrollPane(textArea);
-		buttonChanger = new JButton("Changer lieu");
-		buttonArriver = new JButton("Arriver a l'univ");
+		buttonArriveUniv = new JButton("Entrer");
+		ButtonDepart = new JButton("Aller au departement");
 		buttoinArriverProf = new JButton("Prof present ");
 		buttonGoClasse = new JButton("Strat cours");
 		buttonAbsProf = new JButton("Prof ABS");
@@ -81,15 +84,16 @@ public class GUIproject extends JFrame implements ActionListener {
 		imageEtudiante.setLayout(null);
 		imageDepartement3D.setLayout(null);
 		imageEtudiante.setBounds(380, 500, 100, 100);
-		panelDepartement.setBackground(Color.LIGHT_GRAY);
+		panelDepartement.setBackground(Color.WHITE);
 		panelDepartement.setOpaque(false);
 		panelDepartement.add(imageDepartement3D);
 		panel.add(imageEtudiante);
 		panel.add(panelDepartement);
-		//univ
+		panel.setBackground(Color.white);
+		// univ
 		panelUniv = new JPanel();
-		
-		panelUniv.setBackground(Color.black);
+
+		panelUniv.setBackground(Color.white);
 		panelUniv.setOpaque(false);
 		imageUniv3D = new JLabel(new ImageIcon(urlImageUniv3D));
 		panelUniv.add(imageUniv3D);
@@ -100,15 +104,15 @@ public class GUIproject extends JFrame implements ActionListener {
 		container.add(panel);
 		panel.setLayout(null);
 		// frame
-		frame.setSize(1360, 700);
+		frame.setSize(1360, 640);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.setResizable(false);
-		panel.setBackground(Color.LIGHT_GRAY);
+		panel.setBackground(Color.white);
 		frame.add(panel);
 		// button start
-		buttonChanger.setBounds(1210, 300, 100, 30);
-		panel.add(buttonChanger);
+		buttonArriveUniv.setBounds(1210, 300, 100, 30);
+		panel.add(buttonArriveUniv);
 		// button exit
 		buttoinArriverProf.setBounds(1210, 340, 100, 30);
 		panel.add(buttoinArriverProf);
@@ -116,17 +120,15 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonGoClasse.setBounds(1210, 380, 100, 30);
 		panel.add(buttonGoClasse);
 		// button Arriver
-		buttonArriver.setBounds(1050, 300, 130, 30);
-		panel.add(buttonArriver);
-		//buttonABS
+		ButtonDepart.setBounds(1050, 300, 130, 30);
+		panel.add(ButtonDepart);
+		// buttonABS
 		buttonAbsProf.setBounds(1210, 420, 100, 30);
 		panel.add(buttonAbsProf);
 		// textArea
 		textArea.setEditable(false);
 		textArea.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 15));
-		//textArea.setForeground(Color.BLUE);
-		//textArea.setBackground(Color.GREEN);
-	
+
 		textArea.setEnabled(false);
 		// Scrollpanel
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -139,83 +141,138 @@ public class GUIproject extends JFrame implements ActionListener {
 		System.setOut(prints);
 		System.setErr(prints);
 		// ActionListner
-		buttonChanger.addActionListener(this);
+		buttonArriveUniv.addActionListener(this);
 		buttoinArriverProf.addActionListener(this);
 		buttonGoClasse.addActionListener(this);
-		buttonArriver.addActionListener(this);
+		ButtonDepart.addActionListener(this);
 		buttonAbsProf.addActionListener(this);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		 
+
 	}
+
 	public GUIproject() {
-		// TODO Auto-generated constructor stub
+
 	}
+
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == buttonChanger) {
-			System.out.println("Une action va etre effectuer !");
-			//panelUniv.setBounds(300, 40, 1970, 900);
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					
-					makeUI();
-					
-				}
-			});
+		/**
+		 * Arriver a l'université
+		 */
+		if (e.getSource() == buttonArriveUniv) {
+			System.out.println("L'etudiant entre dans l'université !");
+
 		}
+		/**
+		 * Boutton les cours commance
+		 */
 		if (e.getSource() == buttoinArriverProf) {
 			System.out.println("Le prof est en classe; le cour commance ....");
 		}
+		/**
+		 * L'etudiant va en classe
+		 */
 		if (e.getSource() == buttonGoClasse) {
 			System.out.println("l'etudiant va en classe");
-			arriverEtudiant();
+			moveInClasse = new MoveInClasse(this);
+			moveInClasse.start();
+			System.out.println("On attend le prof ... wait ");
 		}
-		if (e.getSource()== buttonArriver) {
-			agentInterfaceInerface.dodis();
+		/**
+		 * Aller au departement
+		 */
+		if (e.getSource() == ButtonDepart) {
+			moveInUniv = new MoveInUniv(this);
+			moveInUniv.start();
 			
+			 moveTimer();
+			SwingUtilities.invokeLater(new Runnable() {
+
+				public void run() {
+
+//makeUI();
+
+				}
+			});
+			// agentInterfaceInerface.NotifyEntreeInUniv();
+
 		}
-		if (e.getSource()==buttonAbsProf){
+		/**
+		 * Boutton declanche abscence du prof
+		 */
+		if (e.getSource() == buttonAbsProf) {
 			System.out.println("Le prof est abscent, vous etes liberes ...");
-			
+
 		}
-			
+		//----------------------------//
+		
+		/**
+		 * Periode d'exam
+		 */
+		//----------------------------//
+		
+		/**
+		 * perdiode de vaccs
+		 */
+		
+		//--------------------------//
+		
+
 	}
 
-	private void arriverEtudiant() {
-		doMove = new DoMove(this);
-		doMove.start();
-		System.out.println("On attend le prof ... wait ");
-	
-	}
-	
+	/**
+	 * Effect move left
+	 */
+
 	public void makeUI() {
 
 		new Timer(5, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panelUniv.setLocation(panelUniv.getX() - 2, 0);
-				
-				if (panelUniv.getX() + panelUniv.getWidth() ==0) {
-					
+
+				panelUniv.setLocation(panelUniv.getX() - 3, 0);
+
+				if (panelUniv.getX() + panelUniv.getWidth() == 0) {
+
 					((Timer) e.getSource()).stop();
 					panelDepartement.setBounds(5, 40, 970, 600);
 					System.out.println("Timer stopped");
-					
+
 				}
 			}
 		}).start();
 		
-		/*new Timer(1/2, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				panelDepartement.setLocation(panelDepartement.getX() +1, 1);
-				if (panelDepartement.getX() + panelDepartement.getWidth() == 0) {
-					((Timer) e.getSource()).stop();
-					System.out.println("Timer stopped");
-				}
-			}
-		}).start();*/
+		
+		
+
+		/*
+		 * new Timer(1/2, new ActionListener() { public void
+		 * actionPerformed(ActionEvent e) {
+		 * panelDepartement.setLocation(panelDepartement.getX() +1, 1); if
+		 * (panelDepartement.getX() + panelDepartement.getWidth() == 0) {
+		 * ((Timer) e.getSource()).stop(); System.out.println("Timer stopped");
+		 * } } }).start();
+		 */
 
 	}
+	/**
+	 * retarde le mouvement du panel univ
+	 */
 	
-	
-	
-	
+	private void moveTimer() {
+		
+		new Timer(1500, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				SwingUtilities.invokeLater(new Runnable() {
+
+					public void run() {
+
+	makeUI();
+
+					}
+				});
+
+				
+			}
+		}).start();
+	}
 }

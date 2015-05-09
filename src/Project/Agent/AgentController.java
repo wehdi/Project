@@ -3,30 +3,25 @@ package Project.Agent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.ParallelBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SequentialBehaviour;
-import jade.core.behaviours.TickerBehaviour;
-import jade.core.messaging.MessageStorage;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.lang.acl.UnreadableException;
 
-import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.concurrent.CyclicBarrier;
-
-import javax.swing.ViewportLayout;
-import javax.xml.ws.Response;
 
 import Project.Metiers.Generate_Planning;
 import Projet.Bdd.StartBdd;
 
 @SuppressWarnings("serial")
-public class AgentBdd extends Agent {
+/**
+ * 
+ * @author ProBook 450g2
+ *Agent qui gere l'authentification de l'etudiant et l'envoi des donnees
+ */
+public class AgentController extends Agent {
 	private StartBdd startBdd;
 	private ArrayList<String> dayList;
 	private ArrayList<String> heurList;
@@ -37,14 +32,17 @@ public class AgentBdd extends Agent {
 	private boolean stop_Planning = false;
 
 	protected void setup() {
+		System.out.println(getLocalName() + " Strat ...");
 		startBdd = new StartBdd();
 		dayList = new ArrayList<>();
 		heurList = new ArrayList<>();
 		moduleList = new ArrayList<>();
 		generate_Planning = new Generate_Planning();
 		messageTab = new ArrayList<>();
+		/**
+		 * Utilisation d'un behavior sequentiel
+		 */
 		SequentialBehaviour comportementSequenctielle = new SequentialBehaviour();
-		// addBehaviour(comportementparallele);
 		addBehaviour(comportementSequenctielle);
 		try {
 			startBdd.openConecction();
@@ -52,7 +50,9 @@ public class AgentBdd extends Agent {
 		} catch (Exception e1) {
 			System.err.println("Erreur when connection open" + e1);
 		}
-		// verrifi l'inscription
+		/**
+		 * Behavior qui verifie les ids
+		 */
 		comportementSequenctielle.addSubBehaviour(new Behaviour() {
 
 			public void action() {
@@ -66,32 +66,46 @@ public class AgentBdd extends Agent {
 				if (receiveMessage != null) {
 					String requestMessage = receiveMessage.getContent()
 							.toString();
-					String userName = requestMessage.substring(0,
+					String pass = requestMessage.substring(0,
 							requestMessage.indexOf("|"));
-					String pass = requestMessage.substring(requestMessage
+					String userName = requestMessage.substring(requestMessage
 							.indexOf("|") + 1);
 					System.out.println("voici le msg receiveMessage vla "
 							+ userName + "  " + pass);
+					/**
+					 * mehdi = 1234 rahim = 12345
+					 */
 
-					if (userName.equals("aa") && pass.equals("aa")) {
-						ACLMessage reponseMessage = new ACLMessage(
-								ACLMessage.INFORM);
-						reponseMessage.setConversationId("resp");
-						AID dummyAid = new AID();
-						dummyAid.setName("agentInterface@192.168.2.3:1099/JADE");
-						dummyAid.addAddresses("http://192.168.2.3:7778/acc");
-						reponseMessage.addReceiver(dummyAid);
-						reponseMessage.setContent("ok");
-						send(reponseMessage);
-						// doWake();
-						stop = true;
+					try {
+						startBdd.openConecction();
+						// change 0 to 1
 
-					} else {
-						block();
+						if (startBdd.getUserName(userName) == 0
+								&& startBdd.getPassword(pass) == 0) {
+							ACLMessage reponseMessage = new ACLMessage(
+									ACLMessage.INFORM);
+							reponseMessage.setConversationId("resp");
+							AID dummyAid = new AID();
+							dummyAid.setName("agentInterface@"
+									+ Const.ipAddress + ":1099/JADE");
+							dummyAid.addAddresses("http://" + Const.ipAddress
+									+ ":7778/acc");
+							reponseMessage.addReceiver(dummyAid);
+							reponseMessage.setContent("ok");
+							send(reponseMessage);
+							// doWake();
+							stop = true;
+							// startBdd.closeConnection();
+
+						} else {
+							block();
+						}
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 
 				} else {
-					System.out.println("noo");
 					block();
 				}
 			}
@@ -104,7 +118,9 @@ public class AgentBdd extends Agent {
 
 		});
 
-		// envoi le planning
+		/**
+		 * Behavior chargé de l'envoi le planning
+		 */
 		comportementSequenctielle.addSubBehaviour(new Behaviour() {
 			@Override
 			public void action() {
@@ -138,18 +154,26 @@ public class AgentBdd extends Agent {
 
 	}
 
+	/**
+	 * 
+	 * Methode d'envoi de message
+	 * 
+	 * @throws IOException
+	 */
 	private void sendMessage(Agent myAgent, ArrayList<String> msgList)
 			throws IOException {
 		ACLMessage sendDay = new ACLMessage(ACLMessage.INFORM);
 		sendDay.setConversationId("go");
 		sendDay.setContentObject(msgList);
 		AID dummyAid = new AID();
-		dummyAid.setName("agentGestion@192.168.2.3:1099/JADE");
-		dummyAid.addAddresses("http://192.168.2.3:7778/acc");
+		dummyAid.setName("agentGestion@" + Const.ipAddress + ":1099/JADE");
+		dummyAid.addAddresses("http://" + Const.ipAddress + ":7778/acc");
 		sendDay.addReceiver(dummyAid);
 		myAgent.send(sendDay);
 		System.out.println("send message ..");
-
+		/**
+		 * l'agent attend confirmationde la bonne reception des donnes
+		 */
 		addBehaviour(new Behaviour() {
 
 			@Override
@@ -163,12 +187,9 @@ public class AgentBdd extends Agent {
 					if (test.equals("stop")) {
 						System.out.println("mesasge recu");
 						stop_Planning = true;
-
 					}
-
 				} else
 					block();
-
 			}
 
 			public boolean done() {
