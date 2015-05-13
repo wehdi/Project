@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.swing.plaf.basic.BasicToolBarUI.DockingListener;
+
 import Project.Metiers.Generate_Planning;
 import Projet.Bdd.StartBdd;
 
@@ -91,7 +93,7 @@ public class AgentController extends Agent {
 							dummyAid.addAddresses("http://" + Const.ipAddress
 									+ ":7778/acc");
 							reponseMessage.addReceiver(dummyAid);
-							reponseMessage.setContent("ok");
+							reponseMessage.setContent("ok|"+userName);
 							send(reponseMessage);
 							// doWake();
 							stop = true;
@@ -186,6 +188,7 @@ public class AgentController extends Agent {
 					String test = reponse.getContent().toString();
 					if (test.equals("stop")) {
 						System.out.println("mesasge recu");
+				
 						stop_Planning = true;
 					}
 				} else
@@ -209,5 +212,6 @@ public class AgentController extends Agent {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
 	}
 }

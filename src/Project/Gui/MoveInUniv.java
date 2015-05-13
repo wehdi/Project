@@ -25,7 +25,7 @@ public class MoveInUniv extends Thread {
 		}
 		try {
 			sleep(900);
-			this.projet.agentInterfaceInerface.NotifyEntreeInUniv();
+			this.projet.agentScolar.NotifyEntreeInUniv();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

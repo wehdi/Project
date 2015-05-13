@@ -7,7 +7,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintStream;
-import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -16,8 +15,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+
+import org.w3c.dom.Text;
 
 import Project.Agent.AgentScolar;
 
@@ -39,6 +41,8 @@ public class GUIproject extends JFrame implements ActionListener {
 	private JButton buttoinArriverProf;
 	private JButton ButtonDepart;
 	private JButton buttonAbsProf;
+	private JButton buttonGroupeRevision;
+	private JButton buttonSendGroupe;
 	private JPanel panel;
 	private Container container;
 	private JButton buttonGoClasse;
@@ -58,10 +62,12 @@ public class GUIproject extends JFrame implements ActionListener {
 
 	private MoveInClasse moveInClasse;
 	private MoveInUniv moveInUniv;
-	protected AgentScolar agentInterfaceInerface;
+	protected AgentScolar agentScolar;
+
+	private JTextField textGroupeevision;
 
 	public GUIproject(final AgentScolar agentScolar) {
-		this.agentInterfaceInerface = agentScolar;
+		this.agentScolar = agentScolar;
 
 		/**
 		 * Instantiation
@@ -76,6 +82,9 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttoinArriverProf = new JButton("Prof present ");
 		buttonGoClasse = new JButton("Strat cours");
 		buttonAbsProf = new JButton("Prof ABS");
+		buttonGroupeRevision = new JButton("Creer groupe");
+		textGroupeevision = new JTextField();
+		buttonSendGroupe = new JButton("Send ...");
 		// departement
 		panelDepartement = new JPanel();
 		panelDepartement.setBounds(1500, 40, 970, 600);
@@ -119,12 +128,19 @@ public class GUIproject extends JFrame implements ActionListener {
 		// bouton bouge
 		buttonGoClasse.setBounds(1210, 380, 100, 30);
 		panel.add(buttonGoClasse);
-		// button Arriver
-		ButtonDepart.setBounds(1050, 300, 130, 30);
+		// button Arriver au departement
+		ButtonDepart.setBounds(1050, 300, 150, 30);
 		panel.add(ButtonDepart);
 		// buttonABS
 		buttonAbsProf.setBounds(1210, 420, 100, 30);
 		panel.add(buttonAbsProf);
+		//
+		buttonGroupeRevision.setBounds(1050, 340, 150, 30);
+		panel.add(buttonGroupeRevision);
+		//
+		buttonSendGroupe.setBounds(880, 340, 70, 30);
+		panel.add(buttonSendGroupe);
+		buttonSendGroupe.setVisible(false);
 		// textArea
 		textArea.setEditable(false);
 		textArea.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 15));
@@ -136,6 +152,11 @@ public class GUIproject extends JFrame implements ActionListener {
 		scroll.setBounds(880, 10, 460, 280);
 		panel.add(scroll);
 		panel.setOpaque(true);
+		// textField
+		textGroupeevision.setBounds(980, 340, 50, 30);
+		panel.add(textGroupeevision);
+		textGroupeevision.setVisible(false);
+
 		// Deviation de flux
 		prints = new PrintStream(new MyOutputstream(textArea));
 		System.setOut(prints);
@@ -146,6 +167,8 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonGoClasse.addActionListener(this);
 		ButtonDepart.addActionListener(this);
 		buttonAbsProf.addActionListener(this);
+		buttonGroupeRevision.addActionListener(this);
+		buttonSendGroupe.addActionListener(this);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
@@ -183,39 +206,62 @@ public class GUIproject extends JFrame implements ActionListener {
 		if (e.getSource() == ButtonDepart) {
 			moveInUniv = new MoveInUniv(this);
 			moveInUniv.start();
-			
-			 moveTimer();
+
+			moveTimer();
 			SwingUtilities.invokeLater(new Runnable() {
 
 				public void run() {
 
-//makeUI();
+					// makeUI();
 
 				}
 			});
-			// agentInterfaceInerface.NotifyEntreeInUniv();
+			// agentScolar.NotifyEntreeInUniv();
 
 		}
 		/**
 		 * Boutton declanche abscence du prof
 		 */
 		if (e.getSource() == buttonAbsProf) {
+			agentScolar.setProfABS("Le module est changé");
 			System.out.println("Le prof est abscent, vous etes liberes ...");
 
 		}
-		//----------------------------//
-		
+		// ----------------------------//
+
 		/**
 		 * Periode d'exam
 		 */
-		//----------------------------//
-		
+		// ----------------------------//
+
 		/**
 		 * perdiode de vaccs
 		 */
-		
-		//--------------------------//
-		
+
+		// --------------------------//
+
+		/**
+		 * Groupe revision
+		 */
+		if (e.getSource() == buttonGroupeRevision) {
+			// agentScolar.setNombreGroupe();
+			buttonSendGroupe.setVisible(true);
+			textGroupeevision.setVisible(true);
+			buttonGroupeRevision.setEnabled(false);
+
+		}
+		// -------------------//
+		if (e.getSource() == buttonSendGroupe) {
+			Integer nbr = Integer.parseInt(textGroupeevision.getText());
+			if (nbr >= 5) {
+				nbr = 4;
+				agentScolar.setNombreGroupe(nbr.toString());
+				
+			} else
+				agentScolar.setNombreGroupe(nbr.toString());
+
+		}
+		// -------------------//
 
 	}
 
@@ -234,14 +280,12 @@ public class GUIproject extends JFrame implements ActionListener {
 
 					((Timer) e.getSource()).stop();
 					panelDepartement.setBounds(5, 40, 970, 600);
+					imageEtudiante.setBounds(380, 500, 100, 100);
 					System.out.println("Timer stopped");
 
 				}
 			}
 		}).start();
-		
-		
-		
 
 		/*
 		 * new Timer(1/2, new ActionListener() { public void
@@ -253,12 +297,13 @@ public class GUIproject extends JFrame implements ActionListener {
 		 */
 
 	}
+
 	/**
 	 * retarde le mouvement du panel univ
 	 */
-	
+
 	private void moveTimer() {
-		
+
 		new Timer(1500, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -266,12 +311,12 @@ public class GUIproject extends JFrame implements ActionListener {
 
 					public void run() {
 
-	makeUI();
+						makeUI();
+						
 
 					}
 				});
 
-				
 			}
 		}).start();
 	}

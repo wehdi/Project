@@ -44,7 +44,7 @@ public class Luncher {
 			/**
 			 * Lancement des 3 agent qui compose notre systemes
 			 */
-	
+			 Thread.sleep(200);
 			agentFils = container.createNewAgent("agentScolar",
 					"Project.Agent.AgentScolar", null);
 			agentFils.start();
