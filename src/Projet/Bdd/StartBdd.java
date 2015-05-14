@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.mysql.jdbc.PreparedStatement;
+
 public class StartBdd {
 	/**
 	 * Classe de la gestion de la base donnees
@@ -51,35 +53,34 @@ public class StartBdd {
 		connection.close();
 		stat.close();
 	}
-	public int getUserName(String name)throws SQLException {
-		String sql = "SELECT * FROM users WHERE Nom = '"+name + "'";
-		 int x=0;
-		 
+
+	public int getUserName(String name) throws SQLException {
+		String sql = "SELECT * FROM users WHERE Nom = '" + name + "'";
+		int x = 0;
+
 		this.stat = connection.createStatement();
 		this.rs = this.stat.executeQuery(sql);
-		
+
 		while (this.rs.next()) {
-		// userName = rs.getString("Nom");
-		  x = rs.getRow();
+			// userName = rs.getString("Nom");
+			x = rs.getRow();
 		}
 		return x;
 	}
-	
-	public int getPassword(String pass)throws SQLException {
+
+	public int getPassword(String pass) throws SQLException {
 		System.out.println(pass);
-		String sql = "SELECT * FROM users WHERE mdp = '"+pass + "'";
-		String password  = null;
-		int x=0;
+		String sql = "SELECT * FROM users WHERE mdp = '" + pass + "'";
+		String password = null;
+		int x = 0;
 		this.stat = connection.createStatement();
 		this.rs = this.stat.executeQuery(sql);
-		
+
 		while (this.rs.next()) {
 			x = rs.getRow();
 		}
 		return x;
 	}
-	
-	
 
 	public ArrayList<String> getDay() throws SQLException {
 		String sql = "SELECT Jour FROM planning";
@@ -106,15 +107,43 @@ public class StartBdd {
 	}
 
 	public ArrayList<String> getModule() throws SQLException {
-		String sql = "SELECT Module FROM planning";
+		String sql = "SELECT * FROM planning";
 		this.stat = connection.createStatement();
 		this.rs = this.stat.executeQuery(sql);
 		ArrayList<String> data = new ArrayList<>();
 		while (this.rs.next()) {
-			String prof = rs.getString("Module");
-			data.add(prof);
+			String s = rs.getString("Module");
+			String t = rs.getString("Type");
+			// String n = rs.getString("Prof");
+			data.add(s + " -" + t.toUpperCase());
 		}
 		return data;
+	}
+/**
+ * 
+ * @param day
+ * @param module
+ * @param type
+ * @param heur
+ * @throws Exception
+ */
+	public void insetInPlanning(String day, String module, String type,
+			String heur) throws Exception {
+
+		String sql = "INSERT INTO planning (Jour,Heur,Module,Type,Prof,Groupe,Salle)" +
+		        "VALUES (?, ?, ?, ?, ?, ?, ?)";
+		
+		PreparedStatement preparedStatement = (PreparedStatement) this.connection.prepareStatement(sql);
+		preparedStatement.setString(1, day);
+		preparedStatement.setString(2, heur);
+		preparedStatement.setString(3, module);
+		preparedStatement.setString(4, type);
+		preparedStatement.setString(5, "");
+		preparedStatement.setString(6, "Test3");
+		preparedStatement.setString(7, "Test3");
+		preparedStatement.executeUpdate(); 
+		//this.stat = connection.createStatement();
+		//this.rs = this.stat.executeUpdate(sql);
 	}
 
 }

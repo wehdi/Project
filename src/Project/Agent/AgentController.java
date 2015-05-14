@@ -28,6 +28,7 @@ public class AgentController extends Agent {
 	private ArrayList<String> dayList;
 	private ArrayList<String> heurList;
 	private ArrayList<String> moduleList;
+
 	private ArrayList<String> messageTab;
 	private Generate_Planning generate_Planning;
 	private boolean stop = false;
@@ -39,6 +40,7 @@ public class AgentController extends Agent {
 		dayList = new ArrayList<>();
 		heurList = new ArrayList<>();
 		moduleList = new ArrayList<>();
+
 		generate_Planning = new Generate_Planning();
 		messageTab = new ArrayList<>();
 		/**
@@ -93,7 +95,7 @@ public class AgentController extends Agent {
 							dummyAid.addAddresses("http://" + Const.ipAddress
 									+ ":7778/acc");
 							reponseMessage.addReceiver(dummyAid);
-							reponseMessage.setContent("ok|"+userName);
+							reponseMessage.setContent("ok|" + userName);
 							send(reponseMessage);
 							// doWake();
 							stop = true;
@@ -133,6 +135,7 @@ public class AgentController extends Agent {
 						dayList = startBdd.getDay();
 						heurList = startBdd.getHeur();
 						moduleList = startBdd.getModule();
+
 						messageTab.addAll(generate_Planning.setPlanning(
 								dayList, heurList, moduleList));
 						sendMessage(myAgent, messageTab);
@@ -188,7 +191,7 @@ public class AgentController extends Agent {
 					String test = reponse.getContent().toString();
 					if (test.equals("stop")) {
 						System.out.println("mesasge recu");
-				
+
 						stop_Planning = true;
 					}
 				} else

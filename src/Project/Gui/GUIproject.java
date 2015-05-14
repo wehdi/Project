@@ -33,7 +33,7 @@ public class GUIproject extends JFrame implements ActionListener {
 	/**
 	 * Declaration des variables
 	 */
-	private JFrame frame;
+	//private JFrame this;
 	private JScrollPane scroll;
 	private JTextArea textArea;
 	private PrintStream prints;
@@ -43,6 +43,7 @@ public class GUIproject extends JFrame implements ActionListener {
 	private JButton buttonAbsProf;
 	private JButton buttonGroupeRevision;
 	private JButton buttonSendGroupe;
+	private JButton buttonChangePlanning;
 	private JPanel panel;
 	private Container container;
 	private JButton buttonGoClasse;
@@ -72,8 +73,8 @@ public class GUIproject extends JFrame implements ActionListener {
 		/**
 		 * Instantiation
 		 */
-		frame = new JFrame("University");
-		container = frame.getContentPane();
+		this.setTitle("Smart University ");
+		container = this.getContentPane();
 		textArea = new JTextArea();
 		panel = new JPanel();
 		scroll = new JScrollPane(textArea);
@@ -85,6 +86,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonGroupeRevision = new JButton("Creer groupe");
 		textGroupeevision = new JTextField();
 		buttonSendGroupe = new JButton("Send ...");
+		buttonChangePlanning = new JButton("Modifier Planning");
 		// departement
 		panelDepartement = new JPanel();
 		panelDepartement.setBounds(1500, 40, 970, 600);
@@ -112,13 +114,13 @@ public class GUIproject extends JFrame implements ActionListener {
 		//
 		container.add(panel);
 		panel.setLayout(null);
-		// frame
-		frame.setSize(1360, 640);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-		frame.setResizable(false);
+		// this
+		this.setSize(1360, 640);
+		this.setLocationRelativeTo(null);
+		this.setVisible(true);
+		this.setResizable(false);
 		panel.setBackground(Color.white);
-		frame.add(panel);
+		this.add(panel);
 		// button start
 		buttonArriveUniv.setBounds(1210, 300, 100, 30);
 		panel.add(buttonArriveUniv);
@@ -141,6 +143,10 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonSendGroupe.setBounds(880, 340, 70, 30);
 		panel.add(buttonSendGroupe);
 		buttonSendGroupe.setVisible(false);
+		
+		//
+		buttonChangePlanning.setBounds(1050,380,150,30);
+		panel.add(buttonChangePlanning);
 		// textArea
 		textArea.setEditable(false);
 		textArea.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 15));
@@ -169,7 +175,8 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonAbsProf.addActionListener(this);
 		buttonGroupeRevision.addActionListener(this);
 		buttonSendGroupe.addActionListener(this);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		buttonChangePlanning.addActionListener(this);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
 
@@ -208,14 +215,7 @@ public class GUIproject extends JFrame implements ActionListener {
 			moveInUniv.start();
 
 			moveTimer();
-			SwingUtilities.invokeLater(new Runnable() {
-
-				public void run() {
-
-					// makeUI();
-
-				}
-			});
+		
 			// agentScolar.NotifyEntreeInUniv();
 
 		}
@@ -251,6 +251,9 @@ public class GUIproject extends JFrame implements ActionListener {
 
 		}
 		// -------------------//
+		/**
+		 * Envoi du groupe
+		 */
 		if (e.getSource() == buttonSendGroupe) {
 			Integer nbr = Integer.parseInt(textGroupeevision.getText());
 			if (nbr >= 5) {
@@ -260,6 +263,11 @@ public class GUIproject extends JFrame implements ActionListener {
 			} else
 				agentScolar.setNombreGroupe(nbr.toString());
 
+		}
+		// -------------------//
+		if (e.getSource() == buttonChangePlanning) {
+			new GuiUpdate();
+			
 		}
 		// -------------------//
 
