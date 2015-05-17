@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import javax.swing.plaf.basic.BasicToolBarUI.DockingListener;
-
+import Project.Metiers.Bean;
 import Project.Metiers.Generate_Planning;
 import Projet.Bdd.StartBdd;
 
@@ -25,6 +24,7 @@ import Projet.Bdd.StartBdd;
  */
 public class AgentController extends Agent {
 	private StartBdd startBdd;
+	private Bean bean;
 	private ArrayList<String> dayList;
 	private ArrayList<String> heurList;
 	private ArrayList<String> moduleList;
@@ -32,10 +32,13 @@ public class AgentController extends Agent {
 	private ArrayList<String> messageTab;
 	private Generate_Planning generate_Planning;
 	private boolean stop = false;
-	private boolean stop_Planning = false;
+
+	// private boolean stop_Planning = false;
 
 	protected void setup() {
 		System.out.println(getLocalName() + " Strat ...");
+		bean = new Bean();
+
 		startBdd = new StartBdd();
 		dayList = new ArrayList<>();
 		heurList = new ArrayList<>();
@@ -57,105 +60,14 @@ public class AgentController extends Agent {
 		/**
 		 * Behavior qui verifie les ids
 		 */
-		comportementSequenctielle.addSubBehaviour(new Behaviour() {
-
-			public void action() {
-
-				MessageTemplate modele = MessageTemplate.and(
-						MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-						MessageTemplate.MatchConversationId("id"));
-
-				ACLMessage receiveMessage = myAgent.receive(modele);
-
-				if (receiveMessage != null) {
-					String requestMessage = receiveMessage.getContent()
-							.toString();
-					String pass = requestMessage.substring(0,
-							requestMessage.indexOf("|"));
-					String userName = requestMessage.substring(requestMessage
-							.indexOf("|") + 1);
-					System.out.println("voici le msg receiveMessage vla "
-							+ userName + "  " + pass);
-					/**
-					 * mehdi = 1234 rahim = 12345
-					 */
-
-					try {
-						startBdd.openConecction();
-						// change 0 to 1
-
-						if (startBdd.getUserName(userName) == 0
-								&& startBdd.getPassword(pass) == 0) {
-							ACLMessage reponseMessage = new ACLMessage(
-									ACLMessage.INFORM);
-							reponseMessage.setConversationId("resp");
-							AID dummyAid = new AID();
-							dummyAid.setName("agentInterface@"
-									+ Const.ipAddress + ":1099/JADE");
-							dummyAid.addAddresses("http://" + Const.ipAddress
-									+ ":7778/acc");
-							reponseMessage.addReceiver(dummyAid);
-							reponseMessage.setContent("ok|" + userName);
-							send(reponseMessage);
-							// doWake();
-							stop = true;
-							// startBdd.closeConnection();
-
-						} else {
-							block();
-						}
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-				} else {
-					block();
-				}
-			}
-
-			@Override
-			public boolean done() {
-
-				return stop;
-			}
-
-		});
+		comportementSequenctielle.addSubBehaviour(new VerifyIds());
 
 		/**
 		 * Behavior chargé de l'envoi le planning
 		 */
-		comportementSequenctielle.addSubBehaviour(new Behaviour() {
-			@Override
-			public void action() {
+		comportementSequenctielle.addSubBehaviour(new SendPlanning());
 
-				try {
-					if (dayList.isEmpty() || heurList.isEmpty()
-							|| moduleList.isEmpty()) {
-						dayList = startBdd.getDay();
-						heurList = startBdd.getHeur();
-						moduleList = startBdd.getModule();
-
-						messageTab.addAll(generate_Planning.setPlanning(
-								dayList, heurList, moduleList));
-						sendMessage(myAgent, messageTab);
-
-					} else
-						sendMessage(myAgent, messageTab);
-
-				} catch (SQLException | IOException e) {
-					e.printStackTrace();
-				}
-
-			}
-
-			@Override
-			public boolean done() {
-
-				return stop_Planning;
-			}
-
-		});
+		bean.setAgentController(this);
 
 	}
 
@@ -166,7 +78,8 @@ public class AgentController extends Agent {
 	 * @throws IOException
 	 */
 	private void sendMessage(Agent myAgent, ArrayList<String> msgList)
-			throws IOException {
+
+	throws IOException {
 		ACLMessage sendDay = new ACLMessage(ACLMessage.INFORM);
 		sendDay.setConversationId("go");
 		sendDay.setContentObject(msgList);
@@ -176,34 +89,33 @@ public class AgentController extends Agent {
 		sendDay.addReceiver(dummyAid);
 		myAgent.send(sendDay);
 		System.out.println("send message ..");
-		/**
-		 * l'agent attend confirmationde la bonne reception des donnes
-		 */
-		addBehaviour(new Behaviour() {
 
-			@Override
-			public void action() {
-				MessageTemplate model = MessageTemplate.and(
-						MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-						MessageTemplate.MatchConversationId("stop_planning"));
-				ACLMessage reponse = receive(model);
-				if (reponse != null) {
-					String test = reponse.getContent().toString();
-					if (test.equals("stop")) {
-						System.out.println("mesasge recu");
+	}
 
-						stop_Planning = true;
-					}
-				} else
-					block();
-			}
+	/**
+	 * 
+	 * @param myAgent
+	 * @param msgList
+	 * @throws IOException
+	 */
+	private void sendMessageToUpdate(Agent myAgent, ArrayList<String> msgList)
 
-			public boolean done() {
-				// TODO Auto-generated method stub
-				return stop_Planning;
-			}
-		});
+	throws IOException {
+		System.out.println("send message to update Called..");
+		doWait(4000);
+		ACLMessage sendDay = new ACLMessage(ACLMessage.INFORM);
+		sendDay.setConversationId("update");
+		sendDay.setContentObject(msgList);
+		AID dummyAid = new AID();
+		dummyAid.setName("agentGestion@" + Const.ipAddress + ":1099/JADE");
+		dummyAid.addAddresses("http://" + Const.ipAddress + ":7778/acc");
+		sendDay.addReceiver(dummyAid);
+		myAgent.send(sendDay);
 
+	}
+
+	public void sendPlanning() {
+		this.addBehaviour(new SendPlanningToUpdate());
 	}
 
 	protected void takeDown() {
@@ -217,4 +129,145 @@ public class AgentController extends Agent {
 		}
 
 	}
+
+	/**
+	 * Comportement qui verifie les ids
+	 * 
+	 * @author ProBook 450g2
+	 *
+	 */
+
+	private class VerifyIds extends Behaviour {
+
+		public void action() {
+
+			MessageTemplate modele = MessageTemplate.and(
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+					MessageTemplate.MatchConversationId("id"));
+
+			ACLMessage receiveMessage = myAgent.receive(modele);
+
+			if (receiveMessage != null) {
+				String requestMessage = receiveMessage.getContent().toString();
+				String pass = requestMessage.substring(0,
+						requestMessage.indexOf("|"));
+				String userName = requestMessage.substring(requestMessage
+						.indexOf("|") + 1);
+				System.out.println("voici le msg receiveMessage vla "
+						+ userName + "  " + pass);
+				/**
+				 * mehdi = 1234 rahim = 12345
+				 */
+
+				try {
+					startBdd.openConecction();
+					// change 0 to 1
+
+					if (startBdd.getUserName(userName) == 0
+							&& startBdd.getPassword(pass) == 0) {
+						ACLMessage reponseMessage = new ACLMessage(
+								ACLMessage.INFORM);
+						reponseMessage.setConversationId("resp");
+						AID dummyAid = new AID();
+						dummyAid.setName("agentInterface@" + Const.ipAddress
+								+ ":1099/JADE");
+						dummyAid.addAddresses("http://" + Const.ipAddress
+								+ ":7778/acc");
+						reponseMessage.addReceiver(dummyAid);
+						reponseMessage.setContent("ok|" + userName);
+						send(reponseMessage);
+						// doWake();
+						stop = true;
+						// startBdd.closeConnection();
+
+					} else {
+						block();
+					}
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			} else {
+				block();
+			}
+		}
+
+		@Override
+		public boolean done() {
+
+			return stop;
+		}
+
+	}
+
+	/**
+	 * Comportement qui se cahrge de l'envoi du planning
+	 * 
+	 * @author ProBook 450g2
+	 *
+	 */
+	private class SendPlanning extends OneShotBehaviour {
+
+		@Override
+		public void action() {
+			try {
+		 ArrayList<String> messageTab = new ArrayList<>();
+				if (dayList.isEmpty() || heurList.isEmpty()
+						|| moduleList.isEmpty()) {
+					dayList = startBdd.getDay();
+					heurList = startBdd.getHeur();
+					moduleList = startBdd.getModule();
+
+					messageTab.addAll(generate_Planning.setPlanning(dayList,
+							heurList, moduleList));
+					sendMessage(myAgent, messageTab);
+					messageTab.clear();
+				} else{
+					sendMessage(myAgent, messageTab);
+					messageTab.clear();
+				}
+
+			} catch (SQLException | IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+
+	}
+
+	/**
+	 * 
+	 * @author ProBook 450g2
+	 *
+	 */
+
+	private class SendPlanningToUpdate extends OneShotBehaviour {
+
+		@Override
+		public void action() {
+			try {
+				System.out.println("Behavior SendPlanning Update Called");
+				startBdd.openConecction();
+
+				dayList = startBdd.getDay();
+				heurList = startBdd.getHeur();
+				moduleList = startBdd.getModule();
+				messageTab.addAll(generate_Planning.setPlanning(dayList,
+						heurList, moduleList));
+				sendMessageToUpdate(myAgent, messageTab);
+				messageTab.clear();
+				dayList.clear();
+				moduleList.clear();
+				heurList.clear();
+				System.err.println("im tel ...");
+			} catch (SQLException | IOException e) {
+				System.out.println("catch");
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
 }

@@ -156,6 +156,10 @@ public class Generate_Planning {
 			heurTab.remove(0);
 
 		}
+		
+		moduleTab.clear();
+		jourTab.clear();
+		heurTab.clear();
 		return planningTab;
 
 	}

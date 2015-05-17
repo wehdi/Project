@@ -21,6 +21,7 @@ public class AgentScolar extends Agent {
 		 */
 
 		new GUIproject(this);
+
 		System.out.println(getLocalName() + " Strat ...");
 	}
 
@@ -28,16 +29,15 @@ public class AgentScolar extends Agent {
 	 * Methodes appelees depuis un boutton de la classe GUIproject qui ajoute un
 	 * comportement a l'agent
 	 */
-	/**
-	 * 
-	 */
+
 	public void NotifyEntreeInUniv() {
 		this.addBehaviour(new InfoEvents());
 	}
 
 	/**
 	 * 
-	 * @param nbr
+	 * @param envoyer
+	 *            nbr groupe
 	 */
 
 	public void setNombreGroupe(String nbr) {
@@ -79,7 +79,6 @@ public class AgentScolar extends Agent {
 			System.out.println("deois Interface " + message.getConversationId()
 					+ message.getContent());
 		}
-
 	}
 
 	/**
@@ -96,11 +95,6 @@ public class AgentScolar extends Agent {
 
 		}
 
-		/**
-	 * 
-	 */
-
-		@Override
 		public void action() {
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			message.setConversationId("revision");
@@ -112,19 +106,16 @@ public class AgentScolar extends Agent {
 			myAgent.send(message);
 
 		}
-
 	}
+
 	/**
 	 * 
-	 * @author ProBook 450g2
-	 * Envoi un signale quand le prof est abcent
+	 * @author ProBook 450g2 Envoi un signale quand le prof est abcent
 	 *
 	 */
 
 	private class SetProfABSBehaviour extends OneShotBehaviour {
-		/**
-	 * 
-	 */
+
 		private static final long serialVersionUID = 1L;
 		private String message;
 
@@ -132,7 +123,6 @@ public class AgentScolar extends Agent {
 			this.message = message;
 		}
 
-		@Override
 		public void action() {
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			message.setConversationId("abs");
@@ -142,8 +132,6 @@ public class AgentScolar extends Agent {
 			message.addReceiver(dummyAid2);
 			message.setContent(this.message);
 			myAgent.send(message);
-
 		}
-
 	}
 }

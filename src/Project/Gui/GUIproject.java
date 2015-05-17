@@ -19,9 +19,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.w3c.dom.Text;
-
+import Project.Agent.AgentController;
 import Project.Agent.AgentScolar;
+import Project.Metiers.Bean;
 
 public class GUIproject extends JFrame implements ActionListener {
 	/**
@@ -33,7 +33,7 @@ public class GUIproject extends JFrame implements ActionListener {
 	/**
 	 * Declaration des variables
 	 */
-	//private JFrame this;
+	// private JFrame this;
 	private JScrollPane scroll;
 	private JTextArea textArea;
 	private PrintStream prints;
@@ -64,11 +64,13 @@ public class GUIproject extends JFrame implements ActionListener {
 	private MoveInClasse moveInClasse;
 	private MoveInUniv moveInUniv;
 	protected AgentScolar agentScolar;
+	private Bean bean;
 
 	private JTextField textGroupeevision;
 
 	public GUIproject(final AgentScolar agentScolar) {
 		this.agentScolar = agentScolar;
+		bean = new Bean();
 
 		/**
 		 * Instantiation
@@ -143,9 +145,9 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonSendGroupe.setBounds(880, 340, 70, 30);
 		panel.add(buttonSendGroupe);
 		buttonSendGroupe.setVisible(false);
-		
+
 		//
-		buttonChangePlanning.setBounds(1050,380,150,30);
+		buttonChangePlanning.setBounds(1050, 380, 150, 30);
 		panel.add(buttonChangePlanning);
 		// textArea
 		textArea.setEditable(false);
@@ -215,7 +217,7 @@ public class GUIproject extends JFrame implements ActionListener {
 			moveInUniv.start();
 
 			moveTimer();
-		
+
 			// agentScolar.NotifyEntreeInUniv();
 
 		}
@@ -259,15 +261,19 @@ public class GUIproject extends JFrame implements ActionListener {
 			if (nbr >= 5) {
 				nbr = 4;
 				agentScolar.setNombreGroupe(nbr.toString());
-				
+
 			} else
 				agentScolar.setNombreGroupe(nbr.toString());
 
 		}
+		/**
+		 * Lance l'update de planning !
+		 */
 		// -------------------//
 		if (e.getSource() == buttonChangePlanning) {
-			new GuiUpdate();
-			
+			new GuiUpdate(bean.getAgentController());
+			System.out.println(bean.getAgentController());
+
 		}
 		// -------------------//
 
@@ -320,7 +326,6 @@ public class GUIproject extends JFrame implements ActionListener {
 					public void run() {
 
 						makeUI();
-						
 
 					}
 				});
