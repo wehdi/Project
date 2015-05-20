@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import Project.Metiers.Bean;
+import Project.Metiers.Const;
 import Project.Metiers.Generate_Planning;
 import Projet.Bdd.StartBdd;
 
@@ -24,7 +25,7 @@ import Projet.Bdd.StartBdd;
  */
 public class AgentController extends Agent {
 	private StartBdd startBdd;
-	private Bean bean;
+	//private Bean bean;
 	private ArrayList<String> dayList;
 	private ArrayList<String> heurList;
 	private ArrayList<String> moduleList;
@@ -37,7 +38,7 @@ public class AgentController extends Agent {
 
 	protected void setup() {
 		System.out.println(getLocalName() + " Strat ...");
-		bean = new Bean();
+		//bean = new Bean();
 
 		startBdd = new StartBdd();
 		dayList = new ArrayList<>();
@@ -67,7 +68,7 @@ public class AgentController extends Agent {
 		 */
 		comportementSequenctielle.addSubBehaviour(new SendPlanning());
 
-		bean.setAgentController(this);
+		Bean.setAgentController(this);
 
 	}
 
@@ -149,9 +150,9 @@ public class AgentController extends Agent {
 
 			if (receiveMessage != null) {
 				String requestMessage = receiveMessage.getContent().toString();
-				String pass = requestMessage.substring(0,
+				String userName = requestMessage.substring(0,
 						requestMessage.indexOf("|"));
-				String userName = requestMessage.substring(requestMessage
+				String pass = requestMessage.substring(requestMessage
 						.indexOf("|") + 1);
 				System.out.println("voici le msg receiveMessage vla "
 						+ userName + "  " + pass);
@@ -176,11 +177,14 @@ public class AgentController extends Agent {
 						reponseMessage.addReceiver(dummyAid);
 						reponseMessage.setContent("ok|" + userName);
 						send(reponseMessage);
+						System.out.println("Le mdp est good");
 						// doWake();
 						stop = true;
 						// startBdd.closeConnection();
 
 					} else {
+
+						System.out.println("Le dmp est bad");
 						block();
 					}
 				} catch (SQLException e) {
@@ -212,7 +216,7 @@ public class AgentController extends Agent {
 		@Override
 		public void action() {
 			try {
-		 ArrayList<String> messageTab = new ArrayList<>();
+				ArrayList<String> messageTab = new ArrayList<>();
 				if (dayList.isEmpty() || heurList.isEmpty()
 						|| moduleList.isEmpty()) {
 					dayList = startBdd.getDay();
@@ -223,7 +227,7 @@ public class AgentController extends Agent {
 							heurList, moduleList));
 					sendMessage(myAgent, messageTab);
 					messageTab.clear();
-				} else{
+				} else {
 					sendMessage(myAgent, messageTab);
 					messageTab.clear();
 				}
@@ -231,7 +235,7 @@ public class AgentController extends Agent {
 			} catch (SQLException | IOException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 
 	}
@@ -269,5 +273,8 @@ public class AgentController extends Agent {
 		}
 
 	}
+
+	
+
 
 }

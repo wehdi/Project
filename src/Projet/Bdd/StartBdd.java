@@ -53,17 +53,20 @@ public class StartBdd {
 		connection.close();
 		stat.close();
 	}
-
+	
+	
 	public int getUserName(String name) throws SQLException {
-		String sql = "SELECT * FROM users WHERE Nom = '" + name + "'";
 		int x = 0;
-
+		String sql = "SELECT * FROM users WHERE Nom = '" + name + "'";
+		System.out.println(name);
+		
 		this.stat = connection.createStatement();
 		this.rs = this.stat.executeQuery(sql);
 
 		while (this.rs.next()) {
-			// userName = rs.getString("Nom");
+			
 			x = rs.getRow();
+			
 		}
 		return x;
 	}
@@ -71,12 +74,12 @@ public class StartBdd {
 	public int getPassword(String pass) throws SQLException {
 		System.out.println(pass);
 		String sql = "SELECT * FROM users WHERE mdp = '" + pass + "'";
-		String password = null;
 		int x = 0;
 		this.stat = connection.createStatement();
 		this.rs = this.stat.executeQuery(sql);
 
 		while (this.rs.next()) {
+			
 			x = rs.getRow();
 		}
 		return x;
@@ -119,21 +122,23 @@ public class StartBdd {
 		}
 		return data;
 	}
-/**
- * 
- * @param day
- * @param module
- * @param type
- * @param heur
- * @throws Exception
- */
+
+	/**
+	 * 
+	 * @param day
+	 * @param module
+	 * @param type
+	 * @param heur
+	 * @throws Exception
+	 */
 	public void insetInPlanning(String day, String module, String type,
 			String heur) throws Exception {
 
-		String sql = "INSERT INTO planning (Jour,Heur,Module,Type,Prof,Groupe,Salle)" +
-		        "VALUES (?, ?, ?, ?, ?, ?, ?)";
-		
-		PreparedStatement preparedStatement = (PreparedStatement) this.connection.prepareStatement(sql);
+		String sql = "INSERT INTO planning (Jour,Heur,Module,Type,Prof,Groupe,Salle)"
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+		PreparedStatement preparedStatement = (PreparedStatement) this.connection
+				.prepareStatement(sql);
 		preparedStatement.setString(1, day);
 		preparedStatement.setString(2, heur);
 		preparedStatement.setString(3, module);
@@ -141,9 +146,9 @@ public class StartBdd {
 		preparedStatement.setString(5, "");
 		preparedStatement.setString(6, "Test3");
 		preparedStatement.setString(7, "Test3");
-		preparedStatement.executeUpdate(); 
-		//this.stat = connection.createStatement();
-		//this.rs = this.stat.executeUpdate(sql);
+		preparedStatement.executeUpdate();
+		// this.stat = connection.createStatement();
+		// this.rs = this.stat.executeUpdate(sql);
 	}
 
 }

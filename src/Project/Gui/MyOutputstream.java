@@ -19,7 +19,7 @@ public class MyOutputstream extends OutputStream {
 	public void write(int x) {
 
 		textArea.append(String.valueOf((char) x));
-		textArea.setCaretPosition(textArea.getDocument().getLength());
+	textArea.setCaretPosition(textArea.getDocument().getLength());
 	}
 
 }

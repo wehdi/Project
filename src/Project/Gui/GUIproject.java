@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.Beans;
 import java.io.PrintStream;
 
 import javax.swing.ImageIcon;
@@ -64,6 +65,7 @@ public class GUIproject extends JFrame implements ActionListener {
 	private MoveInClasse moveInClasse;
 	private MoveInUniv moveInUniv;
 	protected AgentScolar agentScolar;
+	private AgentController agentController;
 	private Bean bean;
 
 	private JTextField textGroupeevision;
@@ -179,6 +181,8 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonSendGroupe.addActionListener(this);
 		buttonChangePlanning.addActionListener(this);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		this.agentController = Bean.getAgentController();
 
 	}
 
@@ -199,6 +203,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		 */
 		if (e.getSource() == buttoinArriverProf) {
 			System.out.println("Le prof est en classe; le cour commance ....");
+			this.agentScolar.setStartCour();
 		}
 		/**
 		 * L'etudiant va en classe
