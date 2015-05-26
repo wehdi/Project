@@ -8,7 +8,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import Project.Agent.AgentController;
+import Project.Agent.AgentScolar;
 import Projet.Bdd.StartBdd;
 
 /**
@@ -22,13 +22,13 @@ public class GuiUpdate extends JFrame implements ActionListener {
 	private JComboBox<String> moduleBox;
 	private JComboBox<String> typeBox;
 	private JComboBox<String> heurBox;
-	private AgentController agentController;
+	private AgentScolar agentScolar;
 	private StartBdd startBdd;
 
 	private static final long serialVersionUID = 2009081343946305877L;
 
-	public GuiUpdate(AgentController agentController) {
-		this.agentController = agentController;
+	public GuiUpdate(AgentScolar agentScolar) {
+		this.agentScolar= agentScolar;
 
 		String[] day = { "Samedi", "Dimanche", "Lundi", "Mardi", "Mercredi",
 				"Jeudi" };
@@ -90,7 +90,7 @@ public class GuiUpdate extends JFrame implements ActionListener {
 				startBdd.openConecction();
 				startBdd.insetInPlanning(d, m, t, h);
 				// Thread.sleep(5000);
-				this.agentController.sendPlanning();
+				this.agentScolar.sendPlanning();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

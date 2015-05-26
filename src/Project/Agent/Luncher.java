@@ -22,10 +22,11 @@ public class Luncher {
 	private AgentController agentFils1;
 	private AgentController agentFils2;
 	private Properties proprties;
-	
+
 	/**
 	 * Classe qui se charge du lancement des agents du systemes !
-	 * @throws InterruptedException 
+	 * 
+	 * @throws InterruptedException
 	 * 
 	 */
 
@@ -44,15 +45,12 @@ public class Luncher {
 			/**
 			 * Lancement des 3 agent qui compose notre systemes
 			 */
-			 Thread.sleep(200);
+			Thread.sleep(200);
 			agentFils = container.createNewAgent("agentScolar",
 					"Project.Agent.AgentScolar", null);
 			agentFils.start();
-			
- Thread.sleep(200);
-			agentFils1 = container.createNewAgent("agentController",
-					"Project.Agent.AgentController", null);
-			agentFils1.start();
+
+			Thread.sleep(200);
 			Thread.sleep(200);
 			agentFils2 = container.createNewAgent("agentClasse",
 					"Project.Agent.AgentClasse", null);

@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.Beans;
 import java.io.PrintStream;
 
 import javax.swing.ImageIcon;
@@ -20,9 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import Project.Agent.AgentController;
 import Project.Agent.AgentScolar;
-import Project.Metiers.Bean;
 
 public class GUIproject extends JFrame implements ActionListener {
 	/**
@@ -65,14 +62,12 @@ public class GUIproject extends JFrame implements ActionListener {
 	private MoveInClasse moveInClasse;
 	private MoveInUniv moveInUniv;
 	protected AgentScolar agentScolar;
-	private AgentController agentController;
-	private Bean bean;
+	private JButton buttonDemandeHelp;
 
 	private JTextField textGroupeevision;
 
 	public GUIproject(final AgentScolar agentScolar) {
 		this.agentScolar = agentScolar;
-		bean = new Bean();
 
 		/**
 		 * Instantiation
@@ -91,6 +86,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		textGroupeevision = new JTextField();
 		buttonSendGroupe = new JButton("Send ...");
 		buttonChangePlanning = new JButton("Modifier Planning");
+		buttonDemandeHelp = new JButton("Creer des demendes");
 		// departement
 		panelDepartement = new JPanel();
 		panelDepartement.setBounds(1500, 40, 970, 600);
@@ -151,6 +147,11 @@ public class GUIproject extends JFrame implements ActionListener {
 		//
 		buttonChangePlanning.setBounds(1050, 380, 150, 30);
 		panel.add(buttonChangePlanning);
+		//
+
+		buttonDemandeHelp.setBounds(1050, 420, 150, 30);
+		panel.add(buttonDemandeHelp);
+		//
 		// textArea
 		textArea.setEditable(false);
 		textArea.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 15));
@@ -180,10 +181,8 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonGroupeRevision.addActionListener(this);
 		buttonSendGroupe.addActionListener(this);
 		buttonChangePlanning.addActionListener(this);
+		buttonDemandeHelp.addActionListener(this);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		this.agentController = Bean.getAgentController();
-
 	}
 
 	public GUIproject() {
@@ -220,11 +219,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		if (e.getSource() == ButtonDepart) {
 			moveInUniv = new MoveInUniv(this);
 			moveInUniv.start();
-
 			moveTimer();
-
-			// agentScolar.NotifyEntreeInUniv();
-
 		}
 		/**
 		 * Boutton declanche abscence du prof
@@ -233,6 +228,13 @@ public class GUIproject extends JFrame implements ActionListener {
 			agentScolar.setProfABS("Le module est changé");
 			System.out.println("Le prof est abscent, vous etes liberes ...");
 
+		}
+		/**
+		 * Button soumetre des demndes d'aide
+		 * 
+		 */
+		if (e.getSource() == buttonDemandeHelp) {
+			new GUIDemandeHelp(agentScolar);
 		}
 		// ----------------------------//
 
@@ -247,9 +249,6 @@ public class GUIproject extends JFrame implements ActionListener {
 
 		// --------------------------//
 
-		/**
-		 * Groupe revision
-		 */
 		if (e.getSource() == buttonGroupeRevision) {
 			// agentScolar.setNombreGroupe();
 			buttonSendGroupe.setVisible(true);
@@ -257,7 +256,6 @@ public class GUIproject extends JFrame implements ActionListener {
 			buttonGroupeRevision.setEnabled(false);
 
 		}
-		// -------------------//
 		/**
 		 * Envoi du groupe
 		 */
@@ -274,10 +272,9 @@ public class GUIproject extends JFrame implements ActionListener {
 		/**
 		 * Lance l'update de planning !
 		 */
-		// -------------------//
+
 		if (e.getSource() == buttonChangePlanning) {
-			new GuiUpdate(bean.getAgentController());
-			System.out.println(bean.getAgentController());
+			new GuiUpdate(this.agentScolar);
 
 		}
 		// -------------------//
