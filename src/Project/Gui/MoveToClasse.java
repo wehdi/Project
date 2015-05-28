@@ -1,20 +1,25 @@
 package Project.Gui;
 
+/**
+ * Classe qui gére l'annimation d'aller en classe 2eme
+ * 
+ * @author ProBook 450g2
+ *
+ */
 
-public class MoveInUniv extends Thread {
-
+public class MoveToClasse extends Thread {
 	private GUIproject projet;
 
-	public MoveInUniv(GUIproject projet) {
+	public MoveToClasse(GUIproject projet) {
 		this.projet = projet;
-		
+
 	}
 
 	@Override
 	public void run() {
 		super.run();
-		for (int i = 500; i >200; i--) {
-			projet.imageEtudiante.setBounds(380, i, 100, 100);
+		for (int i = 280; i > 100; i--) {
+			projet.imageEtudiante.setBounds(i,161, 100, 100);
 			try {
 				sleep(3);
 
@@ -24,16 +29,15 @@ public class MoveInUniv extends Thread {
 			}
 		}
 		try {
-			sleep(900);
-			this.projet.agentScolar.NotifyEntreeInUniv();
+			sleep(100);
+			//this.projet.agentScolar.NotifyEntreeInUniv("me", null);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		
 	}
 	
-   
+	
 
 }

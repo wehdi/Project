@@ -35,9 +35,9 @@ public class GUIproject extends JFrame implements ActionListener {
 	private JScrollPane scroll;
 	private JTextArea textArea;
 	private PrintStream prints;
-	private JButton buttonArriveUniv;
-	private JButton buttoinArriverProf;
-	private JButton ButtonDepart;
+	private JButton buttonBiblio;
+	private JButton buttonStartCours;
+	private JButton buttonProf;
 	private JButton buttonAbsProf;
 	private JButton buttonGroupeRevision;
 	private JButton buttonSendGroupe;
@@ -54,13 +54,30 @@ public class GUIproject extends JFrame implements ActionListener {
 	private JLabel imageUniv3D;
 	protected JLabel imageEtudiante;
 
+	protected JLabel imageEtudianteSport;
+	protected JLabel imageEtudianteGros;
+	protected JLabel imageEtudianteSportif;
+	protected JLabel imagetudianteSportif;
+	protected JLabel imageEtudianteStudieux;
+	protected JLabel imageProfLouche;
+	protected JLabel imageProfBilou;
+	protected JLabel imageProfSteev;
+
 	// url image
 	private final String urlImage3Departement3D = "pictures\\Depart3DTrans2.png";
 	private final String urlImgaEtudiant = "pictures\\etudiante.png";
 	private final String urlImageUniv3D = "pictures\\univ.png";
+	private final String urlImageEtudianteSport = "pictures\\etudiante-sport.png";
+	private final String urlImageEtudianteGros = "pictures\\etudiant-gros.png";
+	private final String urlImageEtudianteSportif = "pictures\\etudiant-sportif.png";
+	private final String urlImageEtudianteStudieux = "pictures\\etudiant-studieux.png";
+	private final String urlImageProfLouche = "pictures\\prof-louche.png";
+	private final String urlImageProfBilou = "pictures\\prof-bilou.png";
+	private final String urlImageProfSteev = "pictures\\prof-steev.png";
 
 	private MoveInClasse moveInClasse;
-	private MoveInUniv moveInUniv;
+	private MoveToClasse moveToClasse;
+	private MoveBiblio moveBiblio;
 	protected AgentScolar agentScolar;
 	private JButton buttonDemandeHelp;
 
@@ -77,10 +94,10 @@ public class GUIproject extends JFrame implements ActionListener {
 		textArea = new JTextArea();
 		panel = new JPanel();
 		scroll = new JScrollPane(textArea);
-		buttonArriveUniv = new JButton("Entrer");
-		ButtonDepart = new JButton("Aller au departement");
-		buttoinArriverProf = new JButton("Prof present ");
-		buttonGoClasse = new JButton("Strat cours");
+		buttonBiblio = new JButton("Bibliotheque");
+		buttonProf = new JButton("Arrivé du prof");
+		buttonStartCours = new JButton("Heure cours ");
+		buttonGoClasse = new JButton("Entrer");
 		buttonAbsProf = new JButton("Prof ABS");
 		buttonGroupeRevision = new JButton("Creer groupe");
 		textGroupeevision = new JTextField();
@@ -88,19 +105,55 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonChangePlanning = new JButton("Modifier Planning");
 		buttonDemandeHelp = new JButton("Creer des demendes");
 		// departement
+		
+		// ------------
+		imageEtudianteGros = new JLabel(new ImageIcon(urlImageEtudianteGros));
+		imageEtudianteSport = new JLabel(new ImageIcon(urlImageEtudianteSport));
+		imageEtudianteSportif = new JLabel(new ImageIcon(
+				urlImageEtudianteSportif));
+		imageEtudianteStudieux = new JLabel(new ImageIcon(
+				urlImageEtudianteStudieux));
+		imageProfBilou = new JLabel(new ImageIcon(urlImageProfBilou));
+		imageProfLouche = new JLabel(new ImageIcon(urlImageProfLouche));
+		imageProfSteev = new JLabel(new ImageIcon(urlImageProfSteev));
+
+		imageEtudianteGros.setLayout(null);
+		imageEtudianteSport.setLayout(null);
+		imageEtudianteSportif.setLayout(null);
+		imageEtudianteStudieux.setLayout(null);
+		imageProfBilou.setLayout(null);
+		imageProfLouche.setLayout(null);
+		imageProfSteev.setLayout(null);
+		imageEtudianteGros.setBounds(290, 650, 128, 128);
+		imageEtudianteSport.setBounds(290, 1250, 128, 128);
+		imageEtudianteSportif.setBounds(290, 1250, 128, 128);
+		imageEtudianteStudieux.setBounds(290, 1250, 128, 128);
+		imageProfBilou.setBounds(290, 1250, 128, 128);
+		imageProfLouche.setBounds(290, 1250, 128, 128);
+		imageProfSteev.setBounds(290, 1250, 128, 128);
+
+		panel.add(imageEtudianteGros);
+		panel.add(imageEtudianteSport);
+		panel.add(imageEtudianteSportif);
+		panel.add(imageEtudianteStudieux);
+		panel.add(imageProfBilou);
+		panel.add(imageProfLouche);
+		panel.add(imageProfSteev);
+		// /------------------
 		panelDepartement = new JPanel();
 		panelDepartement.setBounds(1500, 40, 970, 600);
 		imageDepartement3D = new JLabel(new ImageIcon(urlImage3Departement3D));
 		imageEtudiante = new JLabel(new ImageIcon(urlImgaEtudiant));
 		imageEtudiante.setLayout(null);
 		imageDepartement3D.setLayout(null);
-		imageEtudiante.setBounds(380, 500, 100, 100);
+		imageEtudiante.setBounds(280, 500, 100, 100);
 		panelDepartement.setBackground(Color.WHITE);
 		panelDepartement.setOpaque(false);
 		panelDepartement.add(imageDepartement3D);
 		panel.add(imageEtudiante);
 		panel.add(panelDepartement);
 		panel.setBackground(Color.white);
+	
 		// univ
 		panelUniv = new JPanel();
 
@@ -122,17 +175,17 @@ public class GUIproject extends JFrame implements ActionListener {
 		panel.setBackground(Color.white);
 		this.add(panel);
 		// button start
-		buttonArriveUniv.setBounds(1210, 300, 100, 30);
-		panel.add(buttonArriveUniv);
+		buttonBiblio.setBounds(1210, 300, 100, 30);
+		panel.add(buttonBiblio);
 		// button exit
-		buttoinArriverProf.setBounds(1210, 340, 100, 30);
-		panel.add(buttoinArriverProf);
+		buttonStartCours.setBounds(1210, 340, 100, 30);
+		panel.add(buttonStartCours);
 		// bouton bouge
 		buttonGoClasse.setBounds(1210, 380, 100, 30);
 		panel.add(buttonGoClasse);
 		// button Arriver au departement
-		ButtonDepart.setBounds(1050, 300, 150, 30);
-		panel.add(ButtonDepart);
+		buttonProf.setBounds(1050, 300, 150, 30);
+		panel.add(buttonProf);
 		// buttonABS
 		buttonAbsProf.setBounds(1210, 420, 100, 30);
 		panel.add(buttonAbsProf);
@@ -173,15 +226,18 @@ public class GUIproject extends JFrame implements ActionListener {
 		System.setOut(prints);
 		System.setErr(prints);
 		// ActionListner
-		buttonArriveUniv.addActionListener(this);
-		buttoinArriverProf.addActionListener(this);
+		buttonBiblio.addActionListener(this);
+		buttonStartCours.addActionListener(this);
 		buttonGoClasse.addActionListener(this);
-		ButtonDepart.addActionListener(this);
+		buttonProf.addActionListener(this);
 		buttonAbsProf.addActionListener(this);
 		buttonGroupeRevision.addActionListener(this);
 		buttonSendGroupe.addActionListener(this);
 		buttonChangePlanning.addActionListener(this);
 		buttonDemandeHelp.addActionListener(this);
+
+		//
+
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
@@ -191,21 +247,28 @@ public class GUIproject extends JFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		/**
-		 * Arriver a l'université
+		 * Enter et passer devant l'université
 		 */
-		if (e.getSource() == buttonArriveUniv) {
+		if (e.getSource() == buttonBiblio) {
 			System.out.println("L'etudiant entre dans l'université !");
+			moveBiblio = new MoveBiblio(this);
+			moveBiblio.start();
 
 		}
 		/**
-		 * Boutton les cours commance
+		 * Boutton les cours commance l'etudiant va au departement
 		 */
-		if (e.getSource() == buttoinArriverProf) {
-			System.out.println("Le prof est en classe; le cour commance ....");
+		if (e.getSource() == buttonStartCours) {
+			moveToClasse = new MoveToClasse(this);
+
+			System.out.println("C'est l'heur d'aller en classe ....");
 			this.agentScolar.setStartCour();
+			moveToClasse.start();
+			moveTimer();
+
 		}
 		/**
-		 * L'etudiant va en classe
+		 * L'etudiant va en classe lalalaal
 		 */
 		if (e.getSource() == buttonGoClasse) {
 			System.out.println("l'etudiant va en classe");
@@ -214,12 +277,12 @@ public class GUIproject extends JFrame implements ActionListener {
 			System.out.println("On attend le prof ... wait ");
 		}
 		/**
-		 * Aller au departement
+		 * Arrivé du prof
 		 */
-		if (e.getSource() == ButtonDepart) {
-			moveInUniv = new MoveInUniv(this);
-			moveInUniv.start();
-			moveTimer();
+		if (e.getSource() == buttonProf) {
+			// moveToClasse = new MoveToClasse(this);
+			// moveToClasse.start();
+
 		}
 		/**
 		 * Boutton declanche abscence du prof

@@ -59,10 +59,13 @@ public class AgentScolar extends Agent {
 	/**
 	 * Methodes appelees depuis un boutton de la classe GUIproject qui ajoute un
 	 * comportement a l'agent
+	 * 
+	 * @param event2
+	 * @param event
 	 */
 
-	public void NotifyEntreeInUniv() {
-		this.addBehaviour(new InfoEvents());
+	public void NotifyEntreeInUniv(String event, String event2) {
+		this.addBehaviour(new InfoEvents(event, event2));
 	}
 
 	/**
@@ -87,14 +90,18 @@ public class AgentScolar extends Agent {
 
 	/**
 	 * 
-	 * @author ProBook 450g2 Comportement de l'agent
+	 * @author ProBook 450g2 Comportement de l'agent notify les evenement
 	 */
 	private class InfoEvents extends OneShotBehaviour {
 
-		/**
-		 * 
-		 */
+		private String event;
+		private String event2;
 		private static final long serialVersionUID = 1L;
+
+		public InfoEvents(String event, String event2) {
+			this.event = event;
+			this.event2 = event2;
+		}
 
 		@Override
 		public void action() {
@@ -105,7 +112,7 @@ public class AgentScolar extends Agent {
 					.setName("agentContexte@" + Const.ipAddress + ":1099/JADE");
 			dummyAid2.addAddresses("http://" + Const.ipAddress + ":7778/acc");
 			message.addReceiver(dummyAid2);
-			message.setContent("kkk");
+			message.setContent(event + "|" + event2);
 			myAgent.send(message);
 			System.out.println("deois Interface " + message.getConversationId()
 					+ message.getContent());
@@ -260,6 +267,8 @@ public class AgentScolar extends Agent {
 
 		@Override
 		public void action() {
+			doWait(1000);
+			System.out.println("Le telephone passe en mode siclencieux ....");
 			ACLMessage sendDay = new ACLMessage(ACLMessage.INFORM);
 			sendDay.setConversationId("mode");
 			sendDay.setContent("0");
@@ -268,7 +277,6 @@ public class AgentScolar extends Agent {
 			dummyAid.addAddresses("http://" + Const.ipAddress + ":7778/acc");
 			sendDay.addReceiver(dummyAid);
 			myAgent.send(sendDay);
-			System.out.println("send message ..");
 
 		}
 

@@ -2,7 +2,7 @@ package Project.Gui;
 
 public class MoveInClasse extends Thread {
 	private GUIproject projet;
-	private bas b;
+	private EnterClass entrer;
 
 	public MoveInClasse(GUIproject projet) {
 		this.projet = projet;
@@ -10,6 +10,9 @@ public class MoveInClasse extends Thread {
 	}
 
 	public void run() {
+		/**
+		 * Mon etudiant
+		 */
 		// mouvement sur l'axe Y
 		for (int i = 500; i > 200; i--) {
 			projet.imageEtudiante.setBounds(380, i, 100, 100);
@@ -22,31 +25,19 @@ public class MoveInClasse extends Thread {
 			}
 		}
 		try {
-			sleep(1000);
+			sleep(900);
+			entrer = new EnterClass(projet);
+			entrer.start();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		b = new bas(projet);
-		b.start();
-		this.stop();
-
-	}
-}
-
-// etudiant entre en classe
-class bas extends Thread {
-
-	GUIproject projet;
-
-	public bas(GUIproject projet) {
-		this.projet = projet;
-	}
-
-	public void run() {
-		// mouvement sur l'axe X
-		for (int i = 380; i < 600; i++) {
-			projet.imageEtudiante.setBounds(i, 200, 100, 100);
+		/**
+		 * Gros Etudiant
+		 */
+		for (int i = 650; i > 200; i--) {
+			projet.imageEtudianteGros.setBounds(380, i, 128, 128);
+			projet.imageEtudianteSport.setBounds(330, i-100, 128, 128);
 			try {
 				sleep(3);
 
@@ -54,8 +45,51 @@ class bas extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
 		}
 
-		this.stop();
+	}
+
+	// etudiant entre en classe
+	private class EnterClass extends Thread {
+
+		GUIproject projet;
+
+		public EnterClass(GUIproject projet) {
+			this.projet = projet;
+		}
+
+		public void run() {
+			/**
+			 * Mon etudiant
+			 */
+			// mouvement sur l'axe X
+			for (int i = 380; i < 600; i++) {
+				projet.imageEtudiante.setBounds(i, 200, 100, 100);
+				try {
+					sleep(3);
+					// this.stop();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			/**
+		 * Gros etudiant
+		 */
+			for (int i = 380; i < 600; i++) {
+				projet.imageEtudianteGros.setBounds(i, 200, 128, 128);
+				projet.imageEtudianteSport.setBounds(i, 200, 128, 128);
+				try {
+					sleep(3);
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+		}
 	}
 }
