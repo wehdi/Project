@@ -43,7 +43,7 @@ public class GuiUpdate extends JFrame implements ActionListener {
 		heurBox = new JComboBox<>(heur);
 
 		//
-		this.setBounds(280, 200, 500, 400);
+		this.setBounds(230, 200, 500, 400);
 		this.setVisible(true);
 		this.setResizable(false);
 		this.setTitle("Update planning");

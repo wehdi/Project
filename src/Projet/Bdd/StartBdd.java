@@ -124,7 +124,7 @@ public class StartBdd {
 	}
 
 	/**
-	 * 
+	 * Modifi le planning
 	 * @param day
 	 * @param module
 	 * @param type

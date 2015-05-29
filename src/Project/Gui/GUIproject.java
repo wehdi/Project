@@ -41,7 +41,7 @@ public class GUIproject extends JFrame implements ActionListener {
 	private JButton buttonAbsProf;
 	private JButton buttonGroupeRevision;
 	private JButton buttonSendGroupe;
-	private JButton buttonChangePlanning;
+	private JButton buttonFinCours;
 	private JPanel panel;
 	private Container container;
 	private JButton buttonGoClasse;
@@ -81,7 +81,7 @@ public class GUIproject extends JFrame implements ActionListener {
 	protected AgentScolar agentScolar;
 	private JButton buttonDemandeHelp;
 
-	private JTextField textGroupeevision;
+	private JTextField textGroupeRevision;
 
 	public GUIproject(final AgentScolar agentScolar) {
 		this.agentScolar = agentScolar;
@@ -94,19 +94,22 @@ public class GUIproject extends JFrame implements ActionListener {
 		textArea = new JTextArea();
 		panel = new JPanel();
 		scroll = new JScrollPane(textArea);
+
+		// Button name
 		buttonBiblio = new JButton("Bibliotheque");
 		buttonProf = new JButton("Arrivé du prof");
 		buttonStartCours = new JButton("Heure cours ");
 		buttonGoClasse = new JButton("Entrer");
 		buttonAbsProf = new JButton("Prof ABS");
 		buttonGroupeRevision = new JButton("Creer groupe");
-		textGroupeevision = new JTextField();
+		textGroupeRevision = new JTextField();
 		buttonSendGroupe = new JButton("Send ...");
-		buttonChangePlanning = new JButton("Modifier Planning");
+		buttonFinCours = new JButton("Fin cours");
 		buttonDemandeHelp = new JButton("Creer des demendes");
 		// departement
-		
+
 		// ------------
+		// Image des personnages
 		imageEtudianteGros = new JLabel(new ImageIcon(urlImageEtudianteGros));
 		imageEtudianteSport = new JLabel(new ImageIcon(urlImageEtudianteSport));
 		imageEtudianteSportif = new JLabel(new ImageIcon(
@@ -116,7 +119,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		imageProfBilou = new JLabel(new ImageIcon(urlImageProfBilou));
 		imageProfLouche = new JLabel(new ImageIcon(urlImageProfLouche));
 		imageProfSteev = new JLabel(new ImageIcon(urlImageProfSteev));
-
+		// Layout Label to null
 		imageEtudianteGros.setLayout(null);
 		imageEtudianteSport.setLayout(null);
 		imageEtudianteSportif.setLayout(null);
@@ -153,10 +156,9 @@ public class GUIproject extends JFrame implements ActionListener {
 		panel.add(imageEtudiante);
 		panel.add(panelDepartement);
 		panel.setBackground(Color.white);
-	
+
 		// univ
 		panelUniv = new JPanel();
-
 		panelUniv.setBackground(Color.white);
 		panelUniv.setOpaque(false);
 		imageUniv3D = new JLabel(new ImageIcon(urlImageUniv3D));
@@ -174,32 +176,32 @@ public class GUIproject extends JFrame implements ActionListener {
 		this.setResizable(false);
 		panel.setBackground(Color.white);
 		this.add(panel);
-		// button start
+		// button passer devant la bilbiothéque
 		buttonBiblio.setBounds(1210, 300, 100, 30);
 		panel.add(buttonBiblio);
-		// button exit
+		// button heurs cours commance le tel passe en mode silencieux
 		buttonStartCours.setBounds(1210, 340, 100, 30);
 		panel.add(buttonStartCours);
-		// bouton bouge
+		// bouton Aller en classe avec l'arrivé des personnage
 		buttonGoClasse.setBounds(1210, 380, 100, 30);
 		panel.add(buttonGoClasse);
-		// button Arriver au departement
-		buttonProf.setBounds(1050, 300, 150, 30);
+		// button Arriver au departement du prof bilou
+		buttonProf.setBounds(1210, 420, 100, 30);
 		panel.add(buttonProf);
-		// buttonABS
-		buttonAbsProf.setBounds(1210, 420, 100, 30);
+		// button ABS du prof bilou n'est plus la
+		buttonAbsProf.setBounds(1050, 300, 150, 30);
 		panel.add(buttonAbsProf);
-		//
-		buttonGroupeRevision.setBounds(1050, 340, 150, 30);
+		// creer groupe de revision
+		buttonGroupeRevision.setBounds(1050, 380, 150, 30);
 		panel.add(buttonGroupeRevision);
-		//
-		buttonSendGroupe.setBounds(880, 340, 70, 30);
+		// Envoyer groupe de revision
+		buttonSendGroupe.setBounds(980, 380, 70, 30);
 		panel.add(buttonSendGroupe);
 		buttonSendGroupe.setVisible(false);
 
 		//
-		buttonChangePlanning.setBounds(1050, 380, 150, 30);
-		panel.add(buttonChangePlanning);
+		buttonFinCours.setBounds(1050, 340, 150, 30);
+		panel.add(buttonFinCours);
 		//
 
 		buttonDemandeHelp.setBounds(1050, 420, 150, 30);
@@ -217,9 +219,9 @@ public class GUIproject extends JFrame implements ActionListener {
 		panel.add(scroll);
 		panel.setOpaque(true);
 		// textField
-		textGroupeevision.setBounds(980, 340, 50, 30);
-		panel.add(textGroupeevision);
-		textGroupeevision.setVisible(false);
+		textGroupeRevision.setBounds(980, 340, 50, 30);
+		panel.add(textGroupeRevision);
+		textGroupeRevision.setVisible(false);
 
 		// Deviation de flux
 		prints = new PrintStream(new MyOutputstream(textArea));
@@ -233,7 +235,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonAbsProf.addActionListener(this);
 		buttonGroupeRevision.addActionListener(this);
 		buttonSendGroupe.addActionListener(this);
-		buttonChangePlanning.addActionListener(this);
+		buttonFinCours.addActionListener(this);
 		buttonDemandeHelp.addActionListener(this);
 
 		//
@@ -245,6 +247,10 @@ public class GUIproject extends JFrame implements ActionListener {
 
 	}
 
+	// ------------------------------------------------------------------------------------------------------------
+	/**
+	 * Eveneent sur les buttons
+	 */
 	public void actionPerformed(ActionEvent e) {
 		/**
 		 * Enter et passer devant l'université
@@ -260,7 +266,6 @@ public class GUIproject extends JFrame implements ActionListener {
 		 */
 		if (e.getSource() == buttonStartCours) {
 			moveToClasse = new MoveToClasse(this);
-
 			System.out.println("C'est l'heur d'aller en classe ....");
 			this.agentScolar.setStartCour();
 			moveToClasse.start();
@@ -275,21 +280,31 @@ public class GUIproject extends JFrame implements ActionListener {
 			moveInClasse = new MoveInClasse(this);
 			moveInClasse.start();
 			System.out.println("On attend le prof ... wait ");
+
+			imageEtudianteGros.setBounds(650, 350, 128, 128); // ok
+			imageEtudianteSport.setBounds(650, 15, 128, 128); // ok
+			imageEtudianteSportif.setBounds(200, 150, 128, 128); // ok
+			imageEtudianteStudieux.setBounds(80, 5, 128, 128);
+
+			imageProfLouche.setBounds(800, 350, 128, 128); // ok
+			imageProfSteev.setBounds(50, 150, 128, 128);// ok
 		}
 		/**
 		 * Arrivé du prof
 		 */
 		if (e.getSource() == buttonProf) {
-			// moveToClasse = new MoveToClasse(this);
-			// moveToClasse.start();
-
+			imageProfBilou.setBounds(700, 180, 128, 128);
+			System.out.println("Le prof estla, On peux commancer");
 		}
 		/**
-		 * Boutton declanche abscence du prof
+		 * Boutton declanche abscence du prof et demende un changement de
+		 * l'heure
 		 */
 		if (e.getSource() == buttonAbsProf) {
 			agentScolar.setProfABS("Le module est changé");
 			System.out.println("Le prof est abscent, vous etes liberes ...");
+			new GuiUpdate(this.agentScolar);
+			imageProfBilou.setBounds(700, 1180, 128, 128);
 
 		}
 		/**
@@ -313,39 +328,54 @@ public class GUIproject extends JFrame implements ActionListener {
 		// --------------------------//
 
 		if (e.getSource() == buttonGroupeRevision) {
-			// agentScolar.setNombreGroupe();
+
+			/**
+			 * 
+			 */
 			buttonSendGroupe.setVisible(true);
-			textGroupeevision.setVisible(true);
+			textGroupeRevision.setVisible(true);
 			buttonGroupeRevision.setEnabled(false);
 
 		}
 		/**
-		 * Envoi du groupe
+		 * Envoi du groupe de revision
 		 */
 		if (e.getSource() == buttonSendGroupe) {
-			Integer nbr = Integer.parseInt(textGroupeevision.getText());
+			/**
+			 * 
+			 */
+			Integer nbr = Integer.parseInt(textGroupeRevision.getText());
 			if (nbr >= 5) {
 				nbr = 4;
 				agentScolar.setNombreGroupe(nbr.toString());
 
 			} else
 				agentScolar.setNombreGroupe(nbr.toString());
+			//
+			buttonSendGroupe.setVisible(false);
+			textGroupeRevision.setText("");
+			textGroupeRevision.setVisible(false);
+			buttonGroupeRevision.setEnabled(true);
+			//
+			imageEtudianteGros.setBounds(200, 250, 128, 128);
+			imageEtudianteSport.setBounds(130, 250, 128, 128);
+			imageEtudiante.setBounds(50, 250, 128, 128);
 
 		}
-		/**
-		 * Lance l'update de planning !
-		 */
 
-		if (e.getSource() == buttonChangePlanning) {
-			new GuiUpdate(this.agentScolar);
-
+		if (e.getSource() == buttonFinCours) {
+			imageProfBilou.setBounds(700, 1180, 128, 128);
+			imageProfLouche.setBounds(700, 1180, 128, 128);
+			imageProfSteev.setBounds(700, 1180, 128, 128);
 		}
 		// -------------------//
 
 	}
 
+	// --------------------------------------------------------------------------------------------
+
 	/**
-	 * Effect move left
+	 * Effect move left du panel, aller au departement utilisant un TIMER
 	 */
 
 	public void makeUI() {

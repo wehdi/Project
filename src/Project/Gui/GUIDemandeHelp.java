@@ -30,7 +30,7 @@ public class GUIDemandeHelp extends JFrame implements ActionListener {
 		this.agentScolar = agentScolar;
 		content = new ArrayList<String>();
 
-		this.setBounds(280, 200, 500, 400);
+		this.setBounds(230, 200, 500, 400);
 		this.setVisible(true);
 		this.setResizable(false);
 		this.setTitle("Demande d'aide simulation");
