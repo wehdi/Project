@@ -1,6 +1,11 @@
 package Project.Agent;
 
+import Project.Gui.GUIproject;
+import Project.Metiers.Const;
+import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.lang.acl.ACLMessage;
 
 /**
  * 
@@ -12,8 +17,31 @@ import jade.core.Agent;
 public class AgentClasse extends Agent {
 	@Override
 	protected void setup() {
-		super.setup();
-		System.out.println(getLocalName() + " Strat ...");
+
+		Project.Metiers.Beans.setAgentClass(this);
+	}
+
+	public void setABSProf(String message) {
+		addBehaviour(new ServeillerBehaviour(message));
+	}
+
+	private class ServeillerBehaviour extends OneShotBehaviour {
+		private String message;
+
+		public ServeillerBehaviour(String message) {
+			this.message = message;
+		}
+
+		@Override
+		public void action() {
+			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+			message.setConversationId("tick");
+			message.addReceiver(new AID("agentScolar", AID.ISLOCALNAME));
+			message.setContent(this.message);
+			myAgent.send(message);
+
+		}
+
 	}
 
 }

@@ -32,7 +32,7 @@ public class StartBdd {
 		// Recuperation de la connexion
 		try {
 			connection = DriverManager.getConnection(url, login, mdp);
-			System.out.println("Connexion etablie");
+	
 
 		} catch (SQLException e) {
 			System.err.println("Erreur dans la recup de connexion" + e);
@@ -42,7 +42,7 @@ public class StartBdd {
 		try {
 			this.stat = connection.createStatement();
 
-			System.out.println("Connexion ok");
+		
 
 		} catch (SQLException e) {
 			System.err.println("Erreur dans la creation du statement" + e);
@@ -53,33 +53,32 @@ public class StartBdd {
 		connection.close();
 		stat.close();
 	}
-	
-	
+
 	public int getUserName(String name) throws SQLException {
 		int x = 0;
 		String sql = "SELECT * FROM users WHERE Nom = '" + name + "'";
-		System.out.println(name);
-		
+	
+
 		this.stat = connection.createStatement();
 		this.rs = this.stat.executeQuery(sql);
 
 		while (this.rs.next()) {
-			
+
 			x = rs.getRow();
-			
+
 		}
 		return x;
 	}
 
 	public int getPassword(String pass) throws SQLException {
-		System.out.println(pass);
+	
 		String sql = "SELECT * FROM users WHERE mdp = '" + pass + "'";
 		int x = 0;
 		this.stat = connection.createStatement();
 		this.rs = this.stat.executeQuery(sql);
 
 		while (this.rs.next()) {
-			
+
 			x = rs.getRow();
 		}
 		return x;
@@ -125,6 +124,7 @@ public class StartBdd {
 
 	/**
 	 * Modifi le planning
+	 * 
 	 * @param day
 	 * @param module
 	 * @param type
@@ -147,8 +147,19 @@ public class StartBdd {
 		preparedStatement.setString(6, "Test3");
 		preparedStatement.setString(7, "Test3");
 		preparedStatement.executeUpdate();
-		// this.stat = connection.createStatement();
-		// this.rs = this.stat.executeUpdate(sql);
+
+	}
+
+	public int verifyPlanning(String heur, String day) throws SQLException {
+		int x = 0;
+		String sql = "SELECT * FROM planning WHERE Jour = '" + day
+				+ "' AND Heur = '" + heur + "'";
+		this.stat = connection.createStatement();
+		this.rs = this.stat.executeQuery(sql);
+		while (this.rs.next()) {
+			x = rs.getRow();
+		}
+		return x;
 	}
 
 }

@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import Project.Agent.AgentScolar;
+import Project.Metiers.Beans;
 import Projet.Bdd.StartBdd;
 
 /**
@@ -28,7 +29,7 @@ public class GuiUpdate extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 2009081343946305877L;
 
 	public GuiUpdate(AgentScolar agentScolar) {
-		this.agentScolar= agentScolar;
+		this.agentScolar = agentScolar;
 
 		String[] day = { "Samedi", "Dimanche", "Lundi", "Mardi", "Mercredi",
 				"Jeudi" };
@@ -88,9 +89,17 @@ public class GuiUpdate extends JFrame implements ActionListener {
 			try {
 				// agentScolar.test();
 				startBdd.openConecction();
-				startBdd.insetInPlanning(d, m, t, h);
-				// Thread.sleep(5000);
-				this.agentScolar.sendPlanning();
+				if (startBdd.verifyPlanning(h, d) == 0) {
+					startBdd.insetInPlanning(d, m, t, h);
+					this.agentScolar.sendPlanning();
+					System.out.println("La planning est mise a jour");
+					this.dispose();
+					Beans.getAgentClass()
+							.setABSProf(
+									"Le prof est absent, un amenagement de l'emploi du temps a ete effectue");
+				} else
+					System.out
+							.println("La date est deja prise, choisissez en une autre");
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintStream;
+import java.util.GregorianCalendar;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -19,7 +20,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import Project.Agent.AgentClasse;
 import Project.Agent.AgentScolar;
+import Project.Agent.Luncher;
+import Project.Metiers.Beans;
 
 public class GUIproject extends JFrame implements ActionListener {
 	/**
@@ -35,16 +39,17 @@ public class GUIproject extends JFrame implements ActionListener {
 	private JScrollPane scroll;
 	private JTextArea textArea;
 	private PrintStream prints;
-	private JButton buttonBiblio;
-	private JButton buttonStartCours;
-	private JButton buttonProf;
-	private JButton buttonAbsProf;
+	public JButton buttonBiblio;
+	public JButton buttonStartCours;
+	public JButton buttonProf;
+	public JButton buttonAbsProf;
 	private JButton buttonGroupeRevision;
 	private JButton buttonSendGroupe;
 	private JButton buttonFinCours;
+	private JButton buttonScenario;
 	private JPanel panel;
 	private Container container;
-	private JButton buttonGoClasse;
+	public JButton buttonGoClasse;
 
 	// image
 	private JPanel panelDepartement;
@@ -79,6 +84,7 @@ public class GUIproject extends JFrame implements ActionListener {
 	private MoveToClasse moveToClasse;
 	private MoveBiblio moveBiblio;
 	protected AgentScolar agentScolar;
+	protected AgentClasse agentClass;
 	private JButton buttonDemandeHelp;
 
 	private JTextField textGroupeRevision;
@@ -106,6 +112,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonSendGroupe = new JButton("Send ...");
 		buttonFinCours = new JButton("Fin cours");
 		buttonDemandeHelp = new JButton("Creer des demendes");
+		buttonScenario = new JButton("Lancer scenario");
 		// departement
 
 		// ------------
@@ -198,6 +205,9 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonSendGroupe.setBounds(980, 380, 70, 30);
 		panel.add(buttonSendGroupe);
 		buttonSendGroupe.setVisible(false);
+		// Boutton scenario
+		buttonScenario.setBounds(1080, 470, 180, 50);
+		panel.add(buttonScenario);
 
 		//
 		buttonFinCours.setBounds(1050, 340, 150, 30);
@@ -237,6 +247,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonSendGroupe.addActionListener(this);
 		buttonFinCours.addActionListener(this);
 		buttonDemandeHelp.addActionListener(this);
+		buttonScenario.addActionListener(this);
 
 		//
 
@@ -256,7 +267,8 @@ public class GUIproject extends JFrame implements ActionListener {
 		 * Enter et passer devant l'université
 		 */
 		if (e.getSource() == buttonBiblio) {
-			System.out.println("L'etudiant entre dans l'université !");
+			System.out
+					.println("L'etudiant entre dans l'universite, il passe davant la bibliotheque ... ");
 			moveBiblio = new MoveBiblio(this);
 			moveBiblio.start();
 
@@ -266,26 +278,35 @@ public class GUIproject extends JFrame implements ActionListener {
 		 */
 		if (e.getSource() == buttonStartCours) {
 			moveToClasse = new MoveToClasse(this);
-			System.out.println("C'est l'heur d'aller en classe ....");
+			java.util.GregorianCalendar calendar = new GregorianCalendar();
+			java.util.Date time = calendar.getTime();
+			String min = String.valueOf(calendar.getTime().getMinutes());
+			int sec = calendar.getTime().getSeconds();
+			int heur = calendar.getTime().getHours();
+
+			System.out.println("Il est " + heur + ":" + min
+					+ ", il reste 5 mintues avant le debut du prochain cour");
+
 			this.agentScolar.setStartCour();
 			moveToClasse.start();
 			moveTimer();
+			System.out.println("Le telephone passe en mode silencieux ....");
 
 		}
 		/**
-		 * L'etudiant va en classe lalalaal
+		 * L'etudiant entre en classe
 		 */
 		if (e.getSource() == buttonGoClasse) {
-			System.out.println("l'etudiant va en classe");
+			System.out
+					.println("c'est l'heure , l'etudiant va en classe et attend l'ensegninat");
 			moveInClasse = new MoveInClasse(this);
 			moveInClasse.start();
-			System.out.println("On attend le prof ... wait ");
+			System.out.println("En attente ...  ");
 
 			imageEtudianteGros.setBounds(650, 350, 128, 128); // ok
 			imageEtudianteSport.setBounds(650, 15, 128, 128); // ok
 			imageEtudianteSportif.setBounds(200, 150, 128, 128); // ok
 			imageEtudianteStudieux.setBounds(80, 5, 128, 128);
-
 			imageProfLouche.setBounds(800, 350, 128, 128); // ok
 			imageProfSteev.setBounds(50, 150, 128, 128);// ok
 		}
@@ -294,15 +315,16 @@ public class GUIproject extends JFrame implements ActionListener {
 		 */
 		if (e.getSource() == buttonProf) {
 			imageProfBilou.setBounds(700, 180, 128, 128);
-			System.out.println("Le prof estla, On peux commancer");
+			System.out.println("L'ensegninat est la, le cours debute");
 		}
 		/**
 		 * Boutton declanche abscence du prof et demende un changement de
 		 * l'heure
 		 */
 		if (e.getSource() == buttonAbsProf) {
-			agentScolar.setProfABS("Le module est changé");
-			System.out.println("Le prof est abscent, vous etes liberes ...");
+			this.agentClass = Beans.getAgentClass();
+			System.out
+					.println("Le premiere heure fini, l'ensegninat du second module est absent");
 			new GuiUpdate(this.agentScolar);
 			imageProfBilou.setBounds(700, 1180, 128, 128);
 
@@ -312,26 +334,22 @@ public class GUIproject extends JFrame implements ActionListener {
 		 * 
 		 */
 		if (e.getSource() == buttonDemandeHelp) {
+			System.out.println("Simulation de demandes d'aide");
 			new GUIDemandeHelp(agentScolar);
 		}
-		// ----------------------------//
-
 		/**
-		 * Periode d'exam
+		 * Button senario
 		 */
-		// ----------------------------//
-
+		if (e.getSource() == buttonScenario) {
+			this.agentScolar.simulate(this);
+		}
 		/**
-		 * perdiode de vaccs
+		 * Creation de groupe de revision
 		 */
-
-		// --------------------------//
 
 		if (e.getSource() == buttonGroupeRevision) {
-
-			/**
-			 * 
-			 */
+			System.out
+					.println("Simulation de la creation de groupe de revision");
 			buttonSendGroupe.setVisible(true);
 			textGroupeRevision.setVisible(true);
 			buttonGroupeRevision.setEnabled(false);
@@ -367,12 +385,21 @@ public class GUIproject extends JFrame implements ActionListener {
 			imageProfBilou.setBounds(700, 1180, 128, 128);
 			imageProfLouche.setBounds(700, 1180, 128, 128);
 			imageProfSteev.setBounds(700, 1180, 128, 128);
+			System.out.println("Les cours sont fini, l'etudiant est libre");
 		}
 		// -------------------//
 
 	}
 
 	// --------------------------------------------------------------------------------------------
+
+	private void restart() throws InterruptedException {
+		// TODO Auto-generated method stubthis.dispose();
+		this.dispose();
+		new Luncher();
+		Thread.sleep(500);
+
+	}
 
 	/**
 	 * Effect move left du panel, aller au departement utilisant un TIMER
@@ -390,7 +417,6 @@ public class GUIproject extends JFrame implements ActionListener {
 					((Timer) e.getSource()).stop();
 					panelDepartement.setBounds(5, 40, 970, 600);
 					imageEtudiante.setBounds(380, 500, 100, 100);
-					System.out.println("Timer stopped");
 
 				}
 			}

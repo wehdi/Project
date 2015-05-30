@@ -12,14 +12,11 @@ import jade.wrapper.StaleProxyException;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import Project.Gui.GUIproject;
-
 public class Luncher {
 	private Runtime runtime;
 	private Profile profile;
 	private ContainerController container;;
 	private AgentController agentFils;
-	private AgentController agentFils1;
 	private AgentController agentFils2;
 	private Properties proprties;
 
@@ -45,7 +42,7 @@ public class Luncher {
 			/**
 			 * Lancement des 3 agent qui compose notre systemes
 			 */
-			Thread.sleep(200);
+			Thread.sleep(400);
 			agentFils = container.createNewAgent("agentScolar",
 					"Project.Agent.AgentScolar", null);
 			agentFils.start();

@@ -2,8 +2,10 @@ package Project.Agent;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -24,6 +26,7 @@ public class AgentScolar extends Agent {
 	 *         la resolution de perturbatiion et de transmition de celle ci sous
 	 *         forme de notification
 	 */
+
 	private StartBdd startBdd;
 	private ArrayList<String> dayList;
 	private ArrayList<String> heurList;
@@ -35,9 +38,6 @@ public class AgentScolar extends Agent {
 	private static final long serialVersionUID = 1L;
 
 	protected void setup() {
-		/**
-		 * 
-		 */
 		startBdd = new StartBdd();
 		dayList = new ArrayList<>();
 		heurList = new ArrayList<>();
@@ -51,9 +51,8 @@ public class AgentScolar extends Agent {
 		 * Lancement du Gui de l'application
 		 */
 		addBehaviour(new VerifyIdsBehviour());
-		new GUIproject(this);
 
-		System.out.println(getLocalName() + " Strat ...");
+		new GUIproject(this);
 	}
 
 	/**
@@ -69,6 +68,43 @@ public class AgentScolar extends Agent {
 	}
 
 	/**
+	 * Methode qui notify l'abscence du prof
+	 * 
+	 * @param message
+	 */
+	public void notifyABS(String message) {
+		this.addBehaviour(new InfoEventABSBehaviour(message));
+	}
+
+	/**
+	 * 
+	 * @author ProBook 450g2
+	 *
+	 */
+	private class InfoEventABSBehaviour extends OneShotBehaviour {
+		String message;
+
+		public InfoEventABSBehaviour(String message) {
+			this.message = message;
+		}
+
+		@Override
+		public void action() {
+			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+			message.setConversationId("notify");
+			AID dummyAid2 = new AID();
+			dummyAid2
+					.setName("agentContexte@" + Const.ipAddress + ":1099/JADE");
+			dummyAid2.addAddresses("http://" + Const.ipAddress + ":7778/acc");
+			message.addReceiver(dummyAid2);
+			message.setContent(this.message);
+			myAgent.send(message);
+
+		}
+
+	}
+
+	/**
 	 * 
 	 * @param envoyer
 	 *            nbr groupe
@@ -77,15 +113,6 @@ public class AgentScolar extends Agent {
 	public void setNombreGroupe(String nbr) {
 
 		this.addBehaviour(new setNbrGroupeBehaviour(nbr));
-	}
-
-	/**
-	 * 
-	 * @param message
-	 */
-	public void setProfABS(String message) {
-
-		this.addBehaviour(new SetProfABSBehaviour(message));
 	}
 
 	/**
@@ -114,8 +141,7 @@ public class AgentScolar extends Agent {
 			message.addReceiver(dummyAid2);
 			message.setContent(event + "|" + event2);
 			myAgent.send(message);
-			System.out.println("deois Interface " + message.getConversationId()
-					+ message.getContent());
+
 		}
 	}
 
@@ -173,6 +199,31 @@ public class AgentScolar extends Agent {
 		}
 	}
 
+	/*
+	 * public void notifyAbs(String message) { this.addBehaviour(new
+	 * SetProfABSBehaviour(message)); }
+	 */
+
+	private class WaitProfABSBehaviour extends CyclicBehaviour {
+
+		@Override
+		public void action() {
+			MessageTemplate model = MessageTemplate.and(
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+					MessageTemplate.MatchConversationId("tick"));
+			ACLMessage msg = myAgent.receive(model);
+			if (msg != null) {
+				addBehaviour(new SetProfABSBehaviour("Le module est changé"));
+
+				block();
+			} else
+				block();
+
+		}
+
+		// this.addBehaviour(new SetProfABSBehaviour(message));
+	}
+
 	/**
 	 * 
 	 * @author ProBook 450g2
@@ -180,14 +231,9 @@ public class AgentScolar extends Agent {
 	 */
 
 	private class WaitCreatGroupe extends CyclicBehaviour {
-
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		private ArrayList<String> infoArray;
 
-		@SuppressWarnings("unchecked")
 		public void action() {
 			MessageTemplate model = MessageTemplate.and(
 					MessageTemplate.MatchPerformative(ACLMessage.INFORM),
@@ -205,8 +251,7 @@ public class AgentScolar extends Agent {
 				String module = infoArray.get(1);
 				String jour = infoArray.get(2);
 				String heur = infoArray.get(3);
-				System.out.println(name + " " + module + " " + jour + " "
-						+ heur);
+
 				block();
 			} else {
 				block();
@@ -247,7 +292,6 @@ public class AgentScolar extends Agent {
 				String module = infoArray.get(1);
 				String name = infoArray.get(2);
 
-				System.out.println(name + " " + module + " " + message + " ");
 				block();
 			} else {
 				block();
@@ -268,7 +312,7 @@ public class AgentScolar extends Agent {
 		@Override
 		public void action() {
 			doWait(1000);
-			System.out.println("Le telephone passe en mode siclencieux ....");
+
 			ACLMessage sendDay = new ACLMessage(ACLMessage.INFORM);
 			sendDay.setConversationId("mode");
 			sendDay.setContent("0");
@@ -305,8 +349,7 @@ public class AgentScolar extends Agent {
 						requestMessage.indexOf("|"));
 				String pass = requestMessage.substring(requestMessage
 						.indexOf("|") + 1);
-				System.out.println("voici le msg receiveMessage vla "
-						+ userName + "  " + pass);
+
 				/**
 				 * mehdi = 1234 rahim = 12345
 				 */
@@ -328,10 +371,10 @@ public class AgentScolar extends Agent {
 						reponseMessage.addReceiver(dummyAid);
 						reponseMessage.setContent("ok|" + userName);
 						send(reponseMessage);
-						System.out.println("Le mdp est good");
 						addBehaviour(new SendPlanning());
 						addBehaviour(new WaitCreatGroupe());
 						addBehaviour(new WaitDemandeHelp());
+						addBehaviour(new WaitProfABSBehaviour());
 						block();
 
 					} else {
@@ -347,7 +390,7 @@ public class AgentScolar extends Agent {
 						reponseMessage.addReceiver(dummyAid);
 						reponseMessage.setContent("other");
 						send(reponseMessage);
-						System.out.println("Le dmp est bad");
+
 						block();
 					}
 				} catch (SQLException e) {
@@ -413,7 +456,6 @@ public class AgentScolar extends Agent {
 		dummyAid.addAddresses("http://" + Const.ipAddress + ":7778/acc");
 		sendDay.addReceiver(dummyAid);
 		myAgent.send(sendDay);
-		System.out.println("send message ..");
 
 	}
 
@@ -432,7 +474,7 @@ public class AgentScolar extends Agent {
 		@Override
 		public void action() {
 			try {
-				System.out.println("Behavior SendPlanning Update Called");
+
 				startBdd.openConecction();
 
 				dayList = startBdd.getDay();
@@ -445,9 +487,8 @@ public class AgentScolar extends Agent {
 				dayList.clear();
 				moduleList.clear();
 				heurList.clear();
-				System.err.println("im tel ...");
 			} catch (SQLException | IOException e) {
-				System.out.println("catch");
+
 				e.printStackTrace();
 			}
 
@@ -465,7 +506,7 @@ public class AgentScolar extends Agent {
 	private void sendMessageToUpdate(Agent myAgent, ArrayList<String> msgList)
 
 	throws IOException {
-		System.out.println("send message to update Called..");
+
 		doWait(2000);
 		ACLMessage sendDay = new ACLMessage(ACLMessage.INFORM);
 		sendDay.setConversationId("update");
@@ -517,4 +558,109 @@ public class AgentScolar extends Agent {
 		addBehaviour(new SendHelpDemandeListBehaviour(content));
 	}
 
+	// ---------------------------------------------------------------------------------------
+	public void simulate(GUIproject gui) {
+		addBehaviour(new SimulateBehavior(gui));
+	}
+
+	private class SimulateBehavior extends OneShotBehaviour {
+		GUIproject gui;
+
+		public SimulateBehavior(GUIproject gui) {
+			this.gui = gui;
+		}
+
+		@Override
+		public void action() {
+			this.gui.buttonBiblio.doClick();
+			doWait(2000);
+			addBehaviour(new SimulateBehavior2(this.gui));
+		}
+
+		/*
+		 * t this.gui.buttonGoClasse.doClick(); doWait(3500);
+		 * this.gui.buttonProf.doClick(); doWait(900);
+		 * System.out.println("Entrain d'etudier . . ."); //doWait(2000);
+		 * //System.out.println("fin des cours, l"); doWait(3000);
+		 * this.gui.buttonAbsProf.doClick();
+		 */
+
+	}
+
+	/**
+	 * 
+	 * @author ProBook 450g2
+	 *
+	 */
+	private class SimulateBehavior2 extends OneShotBehaviour {
+		GUIproject gui;
+
+		public SimulateBehavior2(GUIproject gui) {
+			this.gui = gui;
+		}
+
+		@Override
+		public void action() {
+			this.gui.buttonStartCours.doClick();
+			doWait(4000);
+			addBehaviour(new SimulateBehavior3(this.gui));
+		}
+
+	}
+
+	/**
+	 * 
+	 * @author ProBook 450g2
+	 *
+	 */
+	private class SimulateBehavior3 extends OneShotBehaviour {
+		GUIproject gui;
+
+		public SimulateBehavior3(GUIproject gui) {
+			this.gui = gui;
+		}
+
+		@Override
+		public void action() {
+			this.gui.buttonGoClasse.doClick();
+			doWait(3500);
+			addBehaviour(new SimulateBehavior4(this.gui));
+		}
+
+	}
+
+	private class SimulateBehavior4 extends OneShotBehaviour {
+		GUIproject gui;
+
+		public SimulateBehavior4(GUIproject gui) {
+			this.gui = gui;
+		}
+
+		@Override
+		public void action() {
+			this.gui.buttonProf.doClick();
+			doWait(900);
+			addBehaviour(new SimulateBehavior5(this.gui));
+		}
+
+	}
+
+	/**
+	 * 
+	 * @author ProBook 450g2
+	 *
+	 */
+	private class SimulateBehavior5 extends OneShotBehaviour {
+		GUIproject gui;
+
+		public SimulateBehavior5(GUIproject gui) {
+			this.gui = gui;
+		}
+
+		@Override
+		public void action() {
+			doWait(3000);
+			this.gui.buttonAbsProf.doClick();
+		}
+	}
 }
