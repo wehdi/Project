@@ -2,10 +2,8 @@ package Project.Agent;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.SequentialBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
@@ -53,6 +51,7 @@ public class AgentScolar extends Agent {
 		addBehaviour(new VerifyIdsBehviour());
 
 		new GUIproject(this);
+		System.out.println("Lancement de l'application");
 	}
 
 	/**
@@ -213,7 +212,9 @@ public class AgentScolar extends Agent {
 					MessageTemplate.MatchConversationId("tick"));
 			ACLMessage msg = myAgent.receive(model);
 			if (msg != null) {
-				addBehaviour(new SetProfABSBehaviour("Le module est changé"));
+				System.out
+						.println("Un proffesseur est absent, un sceance de rattrapage va etre programme");
+				addBehaviour(new SetProfABSBehaviour("Le module est change"));
 
 				block();
 			} else
@@ -251,7 +252,12 @@ public class AgentScolar extends Agent {
 				String module = infoArray.get(1);
 				String jour = infoArray.get(2);
 				String heur = infoArray.get(3);
-
+				System.out.println();
+				System.out.println();
+				System.out.println("L'etudiant " + name
+						+ " a crrer un groupe pour le module " + module);
+				System.out.println("La revision aura lieu le : " + jour + " a "
+						+ heur);
 				block();
 			} else {
 				block();
@@ -262,6 +268,7 @@ public class AgentScolar extends Agent {
 	}
 
 	/***
+	 * Afficher la demande d'aide envoyer
 	 * 
 	 * @author ProBook 450g2
 	 *
@@ -291,6 +298,12 @@ public class AgentScolar extends Agent {
 				String message = infoArray.get(0);
 				String module = infoArray.get(1);
 				String name = infoArray.get(2);
+				System.out.println();
+				System.out.println();
+
+				System.out.println("L'etudiant " + name
+						+ " demande de l'aide dans le module " + module);
+				System.out.println("Contenu du message : " + message);
 
 				block();
 			} else {
@@ -358,8 +371,8 @@ public class AgentScolar extends Agent {
 					startBdd.openConecction();
 					// change 0 to 1
 
-					if (startBdd.getUserName(userName) == 0
-							&& startBdd.getPassword(pass) == 0) {
+					if (startBdd.getUserName(userName) == 1
+							&& startBdd.getPassword(pass) == 1) {
 						ACLMessage reponseMessage = new ACLMessage(
 								ACLMessage.INFORM);
 						reponseMessage.setConversationId("resp");
@@ -375,6 +388,10 @@ public class AgentScolar extends Agent {
 						addBehaviour(new WaitCreatGroupe());
 						addBehaviour(new WaitDemandeHelp());
 						addBehaviour(new WaitProfABSBehaviour());
+						System.out.println();
+						System.out.println();
+						System.out.println("L'etudiant : " + userName
+								+ " est maintenant connecte");
 						block();
 
 					} else {
@@ -487,6 +504,8 @@ public class AgentScolar extends Agent {
 				dayList.clear();
 				moduleList.clear();
 				heurList.clear();
+				System.out
+						.println("Mise a jour du planning de l'etudiant et notification de celui ci du changement");
 			} catch (SQLException | IOException e) {
 
 				e.printStackTrace();
@@ -572,6 +591,7 @@ public class AgentScolar extends Agent {
 
 		@Override
 		public void action() {
+			System.out.println("Lancement de la simulation");
 			this.gui.buttonBiblio.doClick();
 			doWait(2000);
 			addBehaviour(new SimulateBehavior2(this.gui));

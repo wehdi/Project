@@ -1,5 +1,7 @@
 package Project.Gui;
 
+import jade.tools.introspector.gui.GuiProperties;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -50,6 +52,7 @@ public class GUIproject extends JFrame implements ActionListener {
 	private JPanel panel;
 	private Container container;
 	public JButton buttonGoClasse;
+	private JButton buttonReload;
 
 	// image
 	private JPanel panelDepartement;
@@ -113,6 +116,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonFinCours = new JButton("Fin cours");
 		buttonDemandeHelp = new JButton("Creer des demendes");
 		buttonScenario = new JButton("Lancer scenario");
+		buttonReload = new JButton("Restart");
 		// departement
 
 		// ------------
@@ -217,6 +221,9 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonDemandeHelp.setBounds(1050, 420, 150, 30);
 		panel.add(buttonDemandeHelp);
 		//
+		buttonReload.setBounds(1260, 580, 80, 30);
+		panel.add(buttonReload);
+		//
 		// textArea
 		textArea.setEditable(false);
 		textArea.setFont(new Font("Times New Roman", Font.CENTER_BASELINE, 15));
@@ -248,6 +255,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		buttonFinCours.addActionListener(this);
 		buttonDemandeHelp.addActionListener(this);
 		buttonScenario.addActionListener(this);
+		buttonReload.addActionListener(this);
 
 		//
 
@@ -267,6 +275,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		 * Enter et passer devant l'université
 		 */
 		if (e.getSource() == buttonBiblio) {
+			System.out.println();
 			System.out
 					.println("L'etudiant entre dans l'universite, il passe davant la bibliotheque ... ");
 			moveBiblio = new MoveBiblio(this);
@@ -283,13 +292,14 @@ public class GUIproject extends JFrame implements ActionListener {
 			String min = String.valueOf(calendar.getTime().getMinutes());
 			int sec = calendar.getTime().getSeconds();
 			int heur = calendar.getTime().getHours();
-
+			System.out.println();
 			System.out.println("Il est " + heur + ":" + min
 					+ ", il reste 5 mintues avant le debut du prochain cour");
 
 			this.agentScolar.setStartCour();
 			moveToClasse.start();
 			moveTimer();
+			System.out.println();
 			System.out.println("Le telephone passe en mode silencieux ....");
 
 		}
@@ -297,6 +307,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		 * L'etudiant entre en classe
 		 */
 		if (e.getSource() == buttonGoClasse) {
+			System.out.println();
 			System.out
 					.println("c'est l'heure , l'etudiant va en classe et attend l'ensegninat");
 			moveInClasse = new MoveInClasse(this);
@@ -315,6 +326,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		 */
 		if (e.getSource() == buttonProf) {
 			imageProfBilou.setBounds(700, 180, 128, 128);
+			System.out.println();
 			System.out.println("L'ensegninat est la, le cours debute");
 		}
 		/**
@@ -323,6 +335,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		 */
 		if (e.getSource() == buttonAbsProf) {
 			this.agentClass = Beans.getAgentClass();
+			System.out.println();
 			System.out
 					.println("Le premiere heure fini, l'ensegninat du second module est absent");
 			new GuiUpdate(this.agentScolar);
@@ -334,6 +347,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		 * 
 		 */
 		if (e.getSource() == buttonDemandeHelp) {
+			System.out.println();
 			System.out.println("Simulation de demandes d'aide");
 			new GUIDemandeHelp(agentScolar);
 		}
@@ -348,6 +362,7 @@ public class GUIproject extends JFrame implements ActionListener {
 		 */
 
 		if (e.getSource() == buttonGroupeRevision) {
+			System.out.println();
 			System.out
 					.println("Simulation de la creation de groupe de revision");
 			buttonSendGroupe.setVisible(true);
@@ -385,10 +400,20 @@ public class GUIproject extends JFrame implements ActionListener {
 			imageProfBilou.setBounds(700, 1180, 128, 128);
 			imageProfLouche.setBounds(700, 1180, 128, 128);
 			imageProfSteev.setBounds(700, 1180, 128, 128);
+			System.out.println();
 			System.out.println("Les cours sont fini, l'etudiant est libre");
 		}
 		// -------------------//
 
+		if (e.getSource() == buttonReload) {
+			this.dispose();
+			try {
+				new Luncher();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	// --------------------------------------------------------------------------------------------

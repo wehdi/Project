@@ -34,6 +34,8 @@ public class AgentClasse extends Agent {
 
 		@Override
 		public void action() {
+			System.out.println("L'agent : " + getLocalName()
+					+ " envoi une alerte à l'agent Scolar");
 			ACLMessage message = new ACLMessage(ACLMessage.INFORM);
 			message.setConversationId("tick");
 			message.addReceiver(new AID("agentScolar", AID.ISLOCALNAME));
